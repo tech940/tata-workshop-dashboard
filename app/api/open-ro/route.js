@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { bigquery } from '../../../lib/bigquery';
+import { getMappedLocation } from '../../../lib/locationMapper';
 
 export async function GET(request) {
     try {
@@ -102,7 +103,7 @@ export async function GET(request) {
         return NextResponse.json({
             delays: delaysRows,
             ageing: ageingRows,
-            openRos: listRows,
+            openRos: listRows.map(r => ({ ...r, division: getMappedLocation(r.division) })),
             total: countRows[0] ? countRows[0].total_count : 0
         });
 

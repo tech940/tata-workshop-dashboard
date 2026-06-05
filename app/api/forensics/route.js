@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { bigquery } from '../../../lib/bigquery';
+import { getMappedLocation } from '../../../lib/locationMapper';
 
 export async function GET(request) {
     try {
@@ -25,6 +26,7 @@ export async function GET(request) {
                     Job_Discount as discount,
                     PPL as ppl,
                     \`Service Type\` as service_type,
+                    Division as Location,
                     AVG(Labour_Amount) OVER(PARTITION BY PPL, \`Service Type\`, DATE_TRUNC(\`Invoice Date\`, MONTH)) as model_avg_labour,
                     AVG(Spare_Sale) OVER(PARTITION BY PPL, \`Service Type\`, DATE_TRUNC(\`Invoice Date\`, MONTH)) as model_avg_parts,
                     AVG(Labour_Amount) OVER(PARTITION BY \`Service Type\`, DATE_TRUNC(\`Invoice Date\`, MONTH)) as global_avg_labour,
@@ -94,6 +96,7 @@ export async function GET(request) {
                 invoice_date,
                 reg_no,
                 chassis_no,
+                Location,
                 COALESCE(advisor, 'UNASSIGNED') as advisor_name,
                 labour_amount,
                 spare_sale,
@@ -133,7 +136,7 @@ export async function GET(request) {
         return NextResponse.json({
             summary: summaryRows[0] || { total_checked: 0, avg_global_score: 100, total_rework: 0, total_discount_alerts: 0, total_leak_alerts: 0, total_flagged: 0 },
             advisors: leaderboardRows,
-            flaggedInvoices: invoicesRows
+            flaggedInvoices: invoicesRows.map(r => ({ ...r, Location: getMappedLocation(r.Location) }))
         });
 
     } catch (e) {

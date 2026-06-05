@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { bigquery } from '../../../lib/bigquery';
+import { getMappedLocation } from '../../../lib/locationMapper';
 
 export async function GET(request) {
     try {
@@ -123,12 +124,12 @@ export async function GET(request) {
                 recent: mRecent
             },
             amc: {
-                summary: amcSummary,
-                recent: amcRecent
+                summary: amcSummary.map(a => ({ ...a, division: getMappedLocation(a.division) })),
+                recent: amcRecent.map(a => ({ ...a, division: getMappedLocation(a.division) }))
             },
             ew: {
                 summary: ewSummary,
-                recent: ewRecent
+                recent: ewRecent.map(e => ({ ...e, division: getMappedLocation(e.division) }))
             }
         });
 
