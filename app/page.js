@@ -101,9 +101,17 @@ export default function Home() {
   const [perfFilterAlert, setPerfFilterAlert] = useState('All');
   const [perfFilterModel, setPerfFilterModel] = useState('All');
 
+  // Filter Open ROs by selected location
+  const filteredOpenRos = useMemo(() => {
+    let list = opsOpenRos || [];
+    if (selectedLoc && selectedLoc !== 'All Locations') {
+      list = list.filter(r => r.division === selectedLoc);
+    }
+    return list;
+  }, [opsOpenRos, selectedLoc]);
   
   const aggregatedOpenRo = useMemo(() => {
-    if (!Array.isArray(opsOpenRos) || opsOpenRos.length === 0) return { byType: {}, byReason: [], totalRow: null, reasonTotalRow: null };
+    if (!Array.isArray(filteredOpenRos) || filteredOpenRos.length === 0) return { byType: {}, byReason: [], totalRow: null, reasonTotalRow: null };
 
     const byType = {};
     const byReason = {};
@@ -111,7 +119,7 @@ export default function Home() {
     let gTotal = { count: 0, d0_4: 0, d5_7: 0, d8_15: 0, d15_plus: 0, totalDays: 0 };
     let rTotal = { mech: 0, acc: 0, d0_4: 0, d5_7: 0, d8_15: 0, d15_plus: 0, totalDays: 0 };
 
-    opsOpenRos.forEach(ro => {
+    filteredOpenRos.forEach(ro => {
       if (!ro) return;
       // Clean and normalize
       let rawType = ro.service_type || 'Others';
@@ -175,7 +183,7 @@ export default function Home() {
     const byReasonArray = Object.values(byReason).sort((a,b) => b.count - a.count);
 
     return { byType, byReason: byReasonArray, totalRow: gTotal, reasonTotalRow: rTotal };
-  }, [opsOpenRos]);
+  }, [filteredOpenRos]);
 
   const isMTD = useMemo(() => {
     if (!masterData?.systemToday) return true;
