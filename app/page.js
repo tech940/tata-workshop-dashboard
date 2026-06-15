@@ -3,15 +3,15 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { 
   ResponsiveContainer, 
-  AreaChart, 
-  Area, 
   XAxis, 
   YAxis, 
   Tooltip, 
   CartesianGrid, 
   Legend,
   LineChart,
-  Line
+  Line,
+  LabelList,
+  ReferenceLine
 } from 'recharts';
 
 export default function Home() {
@@ -1439,17 +1439,7 @@ export default function Home() {
             <div className="chart-container" style={{ height: '350px', padding: '20px' }}>
               {processedDayTrends.length > 0 && (
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={processedDayTrends} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="colorCY" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
-                      </linearGradient>
-                      <linearGradient id="colorLY" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#ef4444" stopOpacity={0.15}/>
-                        <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
+                  <LineChart data={processedDayTrends} margin={{ top: 25, right: 10, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                     <XAxis dataKey="day" stroke="var(--subtext)" fontSize={10} tickLine={false} />
                     <YAxis stroke="var(--subtext)" fontSize={10} tickLine={false} />
@@ -1458,9 +1448,20 @@ export default function Home() {
                       formatter={(val) => [currentTrendMode === 'load' ? formatNumber(val) : formatCurrency(val), '']}
                     />
                     <Legend iconType="circle" />
-                    <Area type="monotone" name="Current Year" dataKey="cy" stroke="#3b82f6" strokeWidth={2.5} fillOpacity={1} fill="url(#colorCY)" />
-                    <Area type="monotone" name="Last Year" dataKey="ly" stroke="#ef4444" strokeWidth={1.5} strokeDasharray="5 5" fillOpacity={1} fill="url(#colorLY)" />
-                  </AreaChart>
+                    {trendKpis && trendKpis.fullMonthTarget > 0 && (
+                      <ReferenceLine 
+                        y={trendKpis.fullMonthTarget / 30} 
+                        stroke="#ef4444" 
+                        strokeDasharray="4 4" 
+                      />
+                    )}
+                    <Line type="linear" name="This Year" dataKey="cy" stroke="#1e3a8a" strokeWidth={2.5} dot={{ r: 4, strokeWidth: 2, fill: 'var(--card)' }} activeDot={{ r: 6 }}>
+                      <LabelList dataKey="cy" position="top" style={{ fill: '#1e3a8a', fontSize: 10, fontWeight: 700 }} formatter={(val) => val > 0 ? (currentTrendMode === 'load' ? Math.round(val) : '') : ''} />
+                    </Line>
+                    <Line type="linear" name="Last Year" dataKey="ly" stroke="#22c55e" strokeWidth={2} dot={{ r: 3, strokeWidth: 2, fill: 'var(--card)' }} activeDot={{ r: 5 }}>
+                      <LabelList dataKey="ly" position="bottom" style={{ fill: '#22c55e', fontSize: 10, fontWeight: 600 }} formatter={(val) => val > 0 ? (currentTrendMode === 'load' ? Math.round(val) : '') : ''} />
+                    </Line>
+                  </LineChart>
                 </ResponsiveContainer>
               )}
             </div>
