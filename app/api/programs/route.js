@@ -17,24 +17,24 @@ export async function GET(request) {
                 COUNT(1) as total_count,
                 COUNT(CASE WHEN UPPER(Membership_Status) = 'ACTIVE' OR Membership_Status IS NULL THEN 1 END) as active_count
             FROM \`${projectDataset}.memberships_detailed1\`
-            WHERE Agreement_Start_Date >= SAFE_CAST(@startDate AS DATE)
-              AND Agreement_Start_Date <= SAFE_CAST(@endDate AS DATE)
+            WHERE SAFE_CAST(Agreement_Created_Date AS DATE) >= SAFE_CAST(@startDate AS DATE)
+              AND SAFE_CAST(Agreement_Created_Date AS DATE) <= SAFE_CAST(@endDate AS DATE)
             GROUP BY program_name
             ORDER BY total_count DESC
         `;
 
         const membershipRecentQuery = `
             SELECT 
-                Agreement_Start_Date as start_date,
-                COALESCE(Agreement_Name, Mwmbership) as program_name,
-                Dealer_Name as dealer,
-                Membership_Status as status,
-                Registration_No as reg_no,
-                Chassis_No as chassis_no
+                Agreement_Created_Date as created_date,
+                Customer_Name as customer_name,
+                Mwmbership as type,
+                Paid_Amt as amount,
+                Registration_Number as reg_no,
+                Division as division
             FROM \`${projectDataset}.memberships_detailed1\`
-            WHERE Agreement_Start_Date >= SAFE_CAST(@startDate AS DATE)
-              AND Agreement_Start_Date <= SAFE_CAST(@endDate AS DATE)
-            ORDER BY Agreement_Start_Date DESC
+            WHERE SAFE_CAST(Agreement_Created_Date AS DATE) >= SAFE_CAST(@startDate AS DATE)
+              AND SAFE_CAST(Agreement_Created_Date AS DATE) <= SAFE_CAST(@endDate AS DATE)
+            ORDER BY Agreement_Created_Date DESC
             LIMIT 15
         `;
 
@@ -46,24 +46,24 @@ export async function GET(request) {
                 COALESCE(SUM(Amc_Payment_Amount), 0) as total_revenue,
                 COALESCE(ROUND(AVG(Amc_Payment_Amount), 1), 0) as avg_price
             FROM \`${projectDataset}.Detail_AMC_Report\`
-            WHERE DATE(Amc_Start_Date) >= SAFE_CAST(@startDate AS DATE)
-              AND DATE(Amc_Start_Date) <= SAFE_CAST(@endDate AS DATE)
+            WHERE SAFE_CAST(Sale_Date AS DATE) >= SAFE_CAST(@startDate AS DATE)
+              AND SAFE_CAST(Sale_Date AS DATE) <= SAFE_CAST(@endDate AS DATE)
             GROUP BY division
             ORDER BY total_contracts DESC
         `;
 
         const amcRecentQuery = `
             SELECT 
-                DATE(Amc_Start_Date) as start_date,
+                SAFE_CAST(Sale_Date AS DATE) as start_date,
                 AMC_Contract_No as contract_no,
                 PPL as model,
                 Amc_Payment_Amount as amount,
                 Division as division,
                 Chassis_No as chassis_no
             FROM \`${projectDataset}.Detail_AMC_Report\`
-            WHERE DATE(Amc_Start_Date) >= SAFE_CAST(@startDate AS DATE)
-              AND DATE(Amc_Start_Date) <= SAFE_CAST(@endDate AS DATE)
-            ORDER BY Amc_Start_Date DESC
+            WHERE SAFE_CAST(Sale_Date AS DATE) >= SAFE_CAST(@startDate AS DATE)
+              AND SAFE_CAST(Sale_Date AS DATE) <= SAFE_CAST(@endDate AS DATE)
+            ORDER BY Sale_Date DESC
             LIMIT 15
         `;
 
@@ -75,8 +75,8 @@ export async function GET(request) {
                 COALESCE(SUM(Final_EW_Price_w_o_tax), 0) as total_revenue,
                 COALESCE(SUM(Dealer_Margin), 0) as total_margin
             FROM \`${projectDataset}.extended_warranty\`
-            WHERE Sale_Date >= SAFE_CAST(@startDate AS DATE)
-              AND Sale_Date <= SAFE_CAST(@endDate AS DATE)
+            WHERE SAFE_CAST(Sale_Date AS DATE) >= SAFE_CAST(@startDate AS DATE)
+              AND SAFE_CAST(Sale_Date AS DATE) <= SAFE_CAST(@endDate AS DATE)
             GROUP BY product_name
             ORDER BY total_contracts DESC
         `;
@@ -86,8 +86,19 @@ export async function GET(request) {
                 Division as division,
                 COUNT(1) as total_contracts
             FROM \`${projectDataset}.extended_warranty\`
-            WHERE Sale_Date >= SAFE_CAST(@startDate AS DATE)
-              AND Sale_Date <= SAFE_CAST(@endDate AS DATE)
+            WHERE SAFE_CAST(Sale_Date AS DATE) >= SAFE_CAST(@startDate AS DATE)
+              AND SAFE_CAST(Sale_Date AS DATE) <= SAFE_CAST(@endDate AS DATE)
+            GROUP BY division
+        `;
+
+        const rsaSummaryByLocationQuery = `
+            SELECT 
+                Division as division,
+                COUNT(1) as total_contracts
+            FROM \`${projectDataset}.memberships_detailed1\`
+            WHERE (UPPER(Agreement_Name) LIKE '%ASSISTANCE%' OR UPPER(Mwmbership) LIKE '%ASSISTANCE%')
+              AND SAFE_CAST(Agreement_Created_Date AS DATE) >= SAFE_CAST(@startDate AS DATE)
+              AND SAFE_CAST(Agreement_Created_Date AS DATE) <= SAFE_CAST(@endDate AS DATE)
             GROUP BY division
         `;
 
@@ -100,8 +111,8 @@ export async function GET(request) {
                 Division as division,
                 Chassis_No as chassis_no
             FROM \`${projectDataset}.extended_warranty\`
-            WHERE Sale_Date >= SAFE_CAST(@startDate AS DATE)
-              AND Sale_Date <= SAFE_CAST(@endDate AS DATE)
+            WHERE SAFE_CAST(Sale_Date AS DATE) >= SAFE_CAST(@startDate AS DATE)
+              AND SAFE_CAST(Sale_Date AS DATE) <= SAFE_CAST(@endDate AS DATE)
             ORDER BY Sale_Date DESC
             LIMIT 15
         `;
@@ -119,6 +130,7 @@ export async function GET(request) {
             [amcRecent],
             [ewSummary],
             [ewSummaryByLocation],
+            [rsaSummaryByLocation],
             [ewRecent]
         ] = await Promise.all([
             bigquery.query({ query: membershipSummaryQuery, ...options }),
@@ -127,6 +139,7 @@ export async function GET(request) {
             bigquery.query({ query: amcRecentQuery, ...options }),
             bigquery.query({ query: ewSummaryQuery, ...options }),
             bigquery.query({ query: ewSummaryByLocationQuery, ...options }),
+            bigquery.query({ query: rsaSummaryByLocationQuery, ...options }),
             bigquery.query({ query: ewRecentQuery, ...options })
         ]);
 
@@ -143,6 +156,9 @@ export async function GET(request) {
                 summary: ewSummary,
                 summaryByLocation: ewSummaryByLocation.map(e => ({ ...e, division: getMappedLocation(e.division) })),
                 recent: ewRecent.map(e => ({ ...e, division: getMappedLocation(e.division) }))
+            },
+            rsa: {
+                summaryByLocation: rsaSummaryByLocation.map(r => ({ ...r, division: getMappedLocation(r.division) }))
             }
         });
 
