@@ -72,80 +72,6 @@ export default function Home() {
   const [vasOpenRoMode, setVasOpenRoMode] = useState(false);
   const [vasOpenRoExpandedGroups, setVasOpenRoExpandedGroups] = useState({ 'Accident': true, 'Running Repairs': false, 'Paid Service': false, 'Free Services': false, 'Others': false });
   const [vasExpandedGroups, setVasExpandedGroups] = useState({ 'Paid Services': true, 'Free Services': false, 'Running Repairs': false, 'Accidental': false, 'Others': false });
-"use client";
-
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { 
-  ResponsiveContainer, 
-  XAxis, 
-  YAxis, 
-  Tooltip, 
-  CartesianGrid, 
-  Legend,
-  LineChart,
-  Line,
-  LabelList,
-  ReferenceLine
-} from 'recharts';
-
-export default function Home() {
-  const [mounted, setMounted] = useState(false);
-  
-  // Navigation & UI States
-  const [activeSection, setActiveSection] = useState('trends'); // 'trends', 'vas', 'ops'
-  const [sidebarActive, setSidebarActive] = useState(false);
-  const [theme, setTheme] = useState('standard');
-  // Filter dropdown menus state
-  const [locMenuOpen, setLocMenuOpen] = useState(false);
-  const [servMenuOpen, setServMenuOpen] = useState(false);
-  const [dateMenuOpen, setDateMenuOpen] = useState(false);
-  const [themeMenuOpen, setThemeMenuOpen] = useState(false);
-  const [saMenuOpen, setSaMenuOpen] = useState(false);
-
-  // Global Filter States
-  const [selectedLoc, setSelectedLoc] = useState('All Locations');
-  const [selectedServiceTypes, setSelectedServiceTypes] = useState([]);
-  const [selectedSAs, setSelectedSAs] = useState([]); // array of selected advisors
-  
-  // Calculate current month start and end dates dynamically
-  const [startDate, setStartDate] = useState(() => {
-    const now = new Date();
-    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
-  });
-  const [endDate, setEndDate] = useState(() => {
-    return new Date().toISOString().slice(0, 10);
-  });
-  
-  // Service Type Performance groups expansion state
-  const [trendExpandedGroups, setTrendExpandedGroups] = useState({
-    'Paid Services': true,
-    'Free Services': false,
-    'Running Repairs': false,
-    'Accidental': false,
-    'Others': false
-  });
-
-  // Generalized Card Maximize state (holds id of maximized card)
-  const [maximizedCard, setMaximizedCard] = useState(null);
-
-  // Dashboard Data State (overview, trends, fy, days)
-  const [masterData, setMasterData] = useState(null);
-  const [loadingData, setLoadingData] = useState(true);
-  const [syncStatus, setSyncStatus] = useState(null);
-
-  // Overview sub-tab state (Service Type Performance)
-  const [currentTrendTab, setCurrentTrendTab] = useState('load'); // load, lab, part, labEff, partEff
-  
-  // Day-wise Trend sub-tab state
-  const [currentTrendMode, setCurrentTrendMode] = useState('load'); // load, lab, part, lab_per, part_per
-  const [currentTrendServiceType, setCurrentTrendServiceType] = useState('All');
-
-  // Detailed Workshop Revenue (VAS) state
-  const [vasViewMode, setVasViewMode] = useState('type'); // type or advisor
-  const [vasTypeMode, setVasTypeMode] = useState('MECH'); // MECH, ACC, BOTH
-  const [vasOpenRoMode, setVasOpenRoMode] = useState(false);
-  const [vasOpenRoExpandedGroups, setVasOpenRoExpandedGroups] = useState({ 'Accident': true, 'Running Repairs': false, 'Paid Service': false, 'Free Services': false, 'Others': false });
-  const [vasExpandedGroups, setVasExpandedGroups] = useState({ 'Paid Services': true, 'Free Services': false, 'Running Repairs': false, 'Accidental': false, 'Others': false });
   const [vasMaximized, setVasMaximized] = useState(false);
   const [selectedVehicleDetails, setSelectedVehicleDetails] = useState(null);
 
@@ -154,8 +80,6 @@ export default function Home() {
   const [opsMemberships, setOpsMemberships] = useState([]);
   const [opsAmc, setOpsAmc] = useState([]);
   const [opsEw, setOpsEw] = useState([]);
-  const [opsAmcSummary, setOpsAmcSummary] = useState([]);
-  const [opsEwSummary, setOpsEwSummary] = useState([]);
   const [loadingOps, setLoadingOps] = useState(false);
 
   // Forensic Audit Modal state
@@ -384,8 +308,6 @@ export default function Home() {
       setOpsMemberships(progData.memberships?.recent || []);
       setOpsAmc(progData.amc?.recent || []);
       setOpsEw(progData.ew?.recent || []);
-      setOpsAmcSummary(progData.amc?.summary || []);
-      setOpsEwSummary(progData.ew?.summaryByLocation || []);
     } catch (e) {
       console.error(e);
     } finally {
@@ -544,7 +466,7 @@ export default function Home() {
         
         const mode = currentTrendTab.replace('Eff', '');
         const moneyPrefix = mode === 'lab' ? 'lab_' : 'part_';
-        ts['val_' + k] += (mode === 'load' ? (Number(r[k]) || 0) : (Number(moneyPrefix + k]) || 0));
+        ts['val_' + k] += (mode === 'load' ? (Number(r[k]) || 0) : (Number(r[moneyPrefix + k]) || 0));
       });
       ts.fmly += (Number(r.fmly) || 0);
 
@@ -1170,6 +1092,1264 @@ export default function Home() {
         .fullscreen .table-container td span { font-size: 15px !important; }
         .fullscreen .group-row td { font-size: 16px !important; padding: 18px !important; }
         .fullscreen .child-row td { font-size: 14px !important; padding: 14px 16px !important; }
+        .fullscreen .table-container { max-height: calc(100vh - 150px) !important; overflow-y: auto !important; }
+      `}} />
+      
+      {/* Loading overlay spinner */}
+      {loadingData && (
+        <div id="loader" style={{ display: 'flex' }}>
+          <div className="spinner"></div>
+        </div>
+      )}
+
+      {/* Sidebar Slider Menu */}
+      <div className={`sidebar ${sidebarActive ? 'active' : ''}`} id="sidebar">
+        <div className="sidebar-header">
+          <h3>SMAM TATA PERFORMANCE PORTAL</h3>
+        </div>
+        <div className="sidebar-menu">
+          <div className="sidebar-item sidebar-item-parent open">
+            <span style={{ fontWeight: 700, color: 'var(--navy)' }}>OVERALL PERFORMANCE</span>
+          </div>
+          <div className="sidebar-submenu open">
+            <div 
+              onClick={() => { setActiveSection('trends'); setSidebarActive(false); }} 
+              className={`sidebar-item ${activeSection === 'trends' ? 'active' : ''}`}
+            >
+              CY / LY Trends
+            </div>
+            <div 
+              onClick={() => { setActiveSection('vas'); setSidebarActive(false); }} 
+              className={`sidebar-item ${activeSection === 'vas' ? 'active' : ''}`}
+            >
+              Workshop Performance
+            </div>
+            <div 
+              onClick={() => { setActiveSection('ops'); setSidebarActive(false); }} 
+              className={`sidebar-item ${activeSection === 'ops' ? 'active' : ''}`}
+            >
+              Workshop Operations
+            </div>
+          </div>
+          <div 
+            onClick={triggerSync}
+            className="sidebar-item" 
+            style={{ background: 'var(--navy)', color: 'white', margin: '15px', borderRadius: '8px', justifyContent: 'center', fontWeight: '700' }}
+          >
+            SYNC LIVE DATA
+          </div>
+        </div>
+      </div>
+
+      {/* Sidebar Overlay */}
+      {sidebarActive && (
+        <div className="sidebar-overlay active" id="sidebarOverlay" onClick={() => setSidebarActive(false)}></div>
+      )}
+
+      {/* Top Header Filters & Controls */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', padding: '0 10px', position: 'relative' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+          <div className="header-tab-badge" onClick={() => setSidebarActive(prev => !prev)}>
+            <div style={{ margin: 0 }}>
+              <span style={{ display: 'block', background: 'var(--navy)', width: '20px', height: '2.5px', margin: '3px auto', borderRadius: '2px' }}></span>
+              <span style={{ display: 'block', background: 'var(--navy)', width: '20px', height: '2.5px', margin: '3px auto', borderRadius: '2px' }}></span>
+              <span style={{ display: 'block', background: 'var(--navy)', width: '20px', height: '2.5px', margin: '3px auto', borderRadius: '2px' }}></span>
+            </div>
+            <span id="activeTabName" style={{ fontSize: '9px', fontWeight: '800', color: 'var(--navy)', textTransform: 'uppercase', letterSpacing: '0.3px', lineHeight: '1.2', textAlign: 'center' }}>
+              {activeSection === 'trends' ? 'CY / LY\nTRENDS' : activeSection === 'vas' ? 'WORKSHOP\nPERF' : 'WORKSHOP\nOPS'}
+            </span>
+          </div>
+          <h2 style={{ fontSize: '18px', fontWeight: '800', color: 'var(--navy)', margin: 0 }}>
+            Business Excellence Index SMAM TATA
+          </h2>
+          {masterData?.globalLastDate ? (
+            <span id="lastUpdated" style={{ fontSize: '10px', color: 'var(--subtext)', fontWeight: '600', background: 'rgba(30,58,138,0.05)', padding: '4px 10px', borderRadius: '15px' }}>
+              Data as of: {(() => {
+                const d = masterData.globalLastDate;
+                const parts = d.split('-');
+                if (parts.length === 3) {
+                  const date = new Date(parts[0], parts[1] - 1, parts[2]);
+                  return date.toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' });
+                }
+                return d;
+              })()}
+            </span>
+          ) : (
+            syncStatus && (
+              <span id="lastUpdated" style={{ fontSize: '10px', color: 'var(--subtext)', fontWeight: '600', background: 'rgba(30,58,138,0.05)', padding: '4px 10px', borderRadius: '15px' }}>
+                Data as of: {new Date(syncStatus.Last_Run?.value || syncStatus.Last_Run).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })}
+              </span>
+            )
+          )}
+        </div>
+
+        {/* Top Dropdowns Buttons Bar */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          
+          {/* Location Dropdown */}
+          <div style={{ position: 'relative' }}>
+            <button onClick={() => { closeAllMenus(); setLocMenuOpen(!locMenuOpen); }} className="tab active" style={{ padding: '8px 15px', borderRadius: '20px' }}>
+              📍 Location: <span>{selectedLoc === 'All Locations' ? 'All' : selectedLoc}</span>
+            </button>
+            <div className={`loc-popup ${locMenuOpen ? 'show' : ''}`} style={{ right: 0, top: 'calc(100% + 5px)', minWidth: '180px' }}>
+              {['All Locations', 'JAMMU', 'KATHUA', 'POONCH', 'SAMBA'].map(loc => (
+                <div 
+                  key={loc} 
+                  className={`loc-option ${selectedLoc === loc ? 'active' : ''}`}
+                  onClick={() => { setSelectedLoc(loc); setLocMenuOpen(false); }}
+                >
+                  <div className="loc-dot"></div>{loc}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Service Type Dropdown */}
+          <div style={{ position: 'relative' }}>
+            <button onClick={() => { closeAllMenus(); setServMenuOpen(!servMenuOpen); }} className="tab active" style={{ padding: '8px 15px', borderRadius: '20px' }}>
+              🛠️ Service Type: <span>{selectedServiceTypes.length === aggregatedData?.uniqueTypesList?.length ? 'All' : `${selectedServiceTypes.length} Selected`}</span>
+            </button>
+            <div className={`serv-type-popup ${servMenuOpen ? 'show' : ''}`} style={{ right: 0, top: 'calc(100% + 5px)', minWidth: '200px' }}>
+              <div style={{ padding: '5px', borderBottom: '1px solid var(--border)', marginBottom: '8px' }}>
+                <label style={{ fontSize: '11px', fontWeight: '700', color: 'var(--accent)', cursor: 'pointer', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <input 
+                    type="checkbox" 
+                    checked={selectedServiceTypes.length === aggregatedData?.uniqueTypesList?.length}
+                    onChange={(e) => {
+                      if (e.target.checked && aggregatedData) {
+                        setSelectedServiceTypes([...aggregatedData.uniqueTypesList]);
+                      } else {
+                        setSelectedServiceTypes([]);
+                      }
+                    }}
+                  /> Select All
+                </label>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                {aggregatedData?.uniqueTypesList?.map(t => (
+                  <label key={t} className="serv-option" style={{ display: 'flex', gap: '8px', alignItems: 'center', cursor: 'pointer' }}>
+                    <input 
+                      type="checkbox" 
+                      value={t} 
+                      checked={selectedServiceTypes.includes(t)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedServiceTypes(prev => [...prev, t]);
+                        } else {
+                          setSelectedServiceTypes(prev => prev.filter(item => item !== t));
+                        }
+                      }}
+                    />
+                    <span>{t}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Date Picker Range Dropdown */}
+          <div style={{ position: 'relative' }}>
+            <button onClick={() => { closeAllMenus(); setDateMenuOpen(!dateMenuOpen); }} className="tab active" style={{ padding: '8px 15px', borderRadius: '20px' }}>
+              📅 Date: <span>{startDate && endDate ? `${formatDateDisplay(startDate)} to ${formatDateDisplay(endDate)}` : 'This Month'}</span>
+            </button>
+            <div className={`date-popup ${dateMenuOpen ? 'show' : ''}`} style={{ right: 0, top: 'calc(100% + 5px)', minWidth: '380px' }}>
+              <div className="date-studio-content">
+                <div className="date-sidebar">
+                  <div onClick={() => setPresetRange('thisMonth')} className="date-sidebar-btn">This Month</div>
+                  <div onClick={() => setPresetRange('lastMonth')} className="date-sidebar-btn">Last Month</div>
+                  <div onClick={() => setPresetRange('ytd')} className="date-sidebar-btn">YTD</div>
+                  <div onClick={() => setPresetRange('full')} className="date-sidebar-btn">Full History</div>
+                </div>
+                <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div>
+                    <label style={{ fontSize: '10px', color: 'var(--subtext)', fontWeight: '700', letterSpacing: '1px', textTransform: 'uppercase' }}>
+                      Custom Analysis Window
+                    </label>
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <input 
+                      type="date" 
+                      style={{
+                        flex: 1,
+                        padding: '10px',
+                        border: '1px solid var(--border)',
+                        borderRadius: '8px',
+                        fontSize: '12px',
+                        background: 'var(--bg)',
+                        color: 'var(--text)',
+                        fontWeight: '600',
+                        outline: 'none'
+                      }}
+                      value={startDate} 
+                      onChange={(e) => setStartDate(e.target.value)} 
+                    />
+                    <input 
+                      type="date" 
+                      style={{
+                        flex: 1,
+                        padding: '10px',
+                        border: '1px solid var(--border)',
+                        borderRadius: '8px',
+                        fontSize: '12px',
+                        background: 'var(--bg)',
+                        color: 'var(--text)',
+                        fontWeight: '600',
+                        outline: 'none'
+                      }}
+                      value={endDate} 
+                      onChange={(e) => setEndDate(e.target.value)} 
+                    />
+                  </div>
+                  <button 
+                    onClick={() => setDateMenuOpen(false)} 
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      background: 'var(--navy)',
+                      color: 'var(--navy-text)',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontWeight: '700',
+                      cursor: 'pointer',
+                      marginTop: '15px',
+                      letterSpacing: '0.5px'
+                    }}
+                  >
+                    Apply Selection Instantly
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Theme Studio Dropdown */}
+          <div style={{ position: 'relative' }}>
+            <button onClick={() => { closeAllMenus(); setThemeMenuOpen(!themeMenuOpen); }} className="tab active" style={{ padding: '8px 15px', borderRadius: '20px' }}>
+              🎨 Theme Studio
+            </button>
+            <div className={`theme-popup ${themeMenuOpen ? 'show' : ''}`} style={{ right: 0, top: 'calc(100% + 5px)', minWidth: '250px' }}>
+              <div className="theme-section">
+                <h4>LIGHT THEMES</h4>
+                <div className="theme-options">
+                  {['standard', 'quartz', 'ivory', 'crystal'].map(t => (
+                    <div key={t} className="theme-btn" onClick={() => { setTheme(t); setThemeMenuOpen(false); }}>
+                      <div className="theme-dot" style={{ background: t === 'standard' ? '#f1f5f9' : t === 'quartz' ? '#f8fafc' : t === 'ivory' ? '#fdfcfb' : '#ffffff', borderLeft: '10px solid var(--navy)' }}></div>
+                      <div className="theme-name" style={{ textTransform: 'capitalize' }}>{t}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="theme-section" style={{ marginBottom: 0 }}>
+                <h4>DARK THEMES</h4>
+                <div className="theme-options">
+                  {['carbon', 'royal', 'neon', 'midnight'].map(t => (
+                    <div key={t} className="theme-btn" onClick={() => { setTheme(t); setThemeMenuOpen(false); }}>
+                      <div className="theme-dot" style={{ background: t === 'carbon' ? '#0f172a' : t === 'royal' ? '#0a0a0a' : t === 'neon' ? '#000000' : '#0c0a09', borderLeft: '10px solid var(--navy)' }}></div>
+                      <div className="theme-name" style={{ textTransform: 'capitalize' }}>{t}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Sync Data Trigger */}
+          <button onClick={triggerSync} className="tab active" style={{ borderRadius: '20px', padding: '8px 15px' }}>
+            🔄 Sync Live Data
+          </button>
+        </div>
+      </div>
+
+      {/* -------------------- SECTION 1: CY / LY TRENDS -------------------- */}
+      {activeSection === 'trends' && aggregatedData && (
+        <div id="section-trends">
+          <div style={{ background: 'var(--navy)', color: 'var(--navy-text)', padding: '10px 20px', borderRadius: '8px', marginBottom: '15px', fontWeight: 600, fontSize: '14px', letterSpacing: '0.5px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+            Overall Service Performance
+          </div>
+
+          {/* Overall Load & Service Type Performance Tables */}
+          <div className="grid-top">
+            
+            {/* Overall Load Card */}
+            <div className={`card ${maximizedCard === 'cardOverall' ? 'fullscreen' : ''}`} id="cardOverall">
+              <div className="card-header">
+                <span>Overall Load</span>
+                <span className="max-btn" onClick={() => toggleMax('cardOverall')}>
+                  {maximizedCard === 'cardOverall' ? '⛶ Minimize' : '⛶ Maximize'}
+                </span>
+              </div>
+              <div className="table-container" style={{ maxHeight: '250px' }}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th rowSpan={2}>Location</th>
+                      <th rowSpan={2}>TD</th>
+                      <th colSpan={3}>{isMTD ? 'MTD' : 'RANGE'}</th>
+                      <th colSpan={3}>QTD</th>
+                      <th colSpan={3}>YTD</th>
+                    </tr>
+                    <tr>
+                      <th>CY</th>
+                      <th>LY</th>
+                      <th>Growth</th>
+                      <th>CY</th>
+                      <th>LY</th>
+                      <th>Growth</th>
+                      <th>CY</th>
+                      <th>LY</th>
+                      <th>Growth</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {aggregatedData.locs.map(l => {
+                      const mtdG = calcGrowth(l.rcy, l.rly);
+                      const qtdG = calcGrowth(l.qcy, l.qly);
+                      const ytdG = calcGrowth(l.ycy, l.yly);
+                      return (
+                        <tr key={l.Location}>
+                          <td style={{ textAlign: 'left', fontWeight: '600' }}>{l.Location}</td>
+                          <td>{formatNumber(l.td)}</td>
+                          <td>{formatNumber(l.rcy)}</td>
+                          <td>{formatNumber(l.rly)}</td>
+                          <td><span className={getGrowthClass(mtdG)}>{mtdG}</span></td>
+                          <td>{formatNumber(l.qcy)}</td>
+                          <td>{formatNumber(l.qly)}</td>
+                          <td><span className={getGrowthClass(qtdG)}>{qtdG}</span></td>
+                          <td>{formatNumber(l.ycy)}</td>
+                          <td>{formatNumber(l.yly)}</td>
+                          <td><span className={getGrowthClass(ytdG)}>{ytdG}</span></td>
+                        </tr>
+                      );
+                    })}
+                    {/* Total Row */}
+                    <tr className="total-row">
+                      <td style={{ textAlign: 'left', fontWeight: '600' }}>Total</td>
+                      <td>{formatNumber(aggregatedData.total.td)}</td>
+                      <td>{formatNumber(aggregatedData.total.rcy)}</td>
+                      <td>{formatNumber(aggregatedData.total.rly)}</td>
+                      <td><span className={getGrowthClass(calcGrowth(aggregatedData.total.rcy, aggregatedData.total.rly))}>{calcGrowth(aggregatedData.total.rcy, aggregatedData.total.rly)}</span></td>
+                      <td>{formatNumber(aggregatedData.total.qcy)}</td>
+                      <td>{formatNumber(aggregatedData.total.qly)}</td>
+                      <td><span className={getGrowthClass(calcGrowth(aggregatedData.total.qcy, aggregatedData.total.qly))}>{calcGrowth(aggregatedData.total.qcy, aggregatedData.total.qly)}</span></td>
+                      <td>{formatNumber(aggregatedData.total.ycy)}</td>
+                      <td>{formatNumber(aggregatedData.total.yly)}</td>
+                      <td><span className={getGrowthClass(calcGrowth(aggregatedData.total.ycy, aggregatedData.total.yly))}>{calcGrowth(aggregatedData.total.ycy, aggregatedData.total.yly)}</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              
+              {/* Load summary footer */}
+              <div className="load-summary">
+                <div className="sum-box">
+                  <label>Yesterday Load</label>
+                  <div className="val">{formatNumber(aggregatedData.total.td)}</div>
+                </div>
+                <div className="sum-box">
+                  <label>{isMTD ? 'MTD Load' : 'RANGE Load'}</label>
+                  <div className="val">
+                    <span>{formatNumber(aggregatedData.total.rcy)}</span>
+                    <span 
+                      className={getGrowthClass(calcGrowth(aggregatedData.total.rcy, aggregatedData.total.rly))} 
+                      style={{ marginLeft: '8px' }}
+                    >
+                      {calcGrowth(aggregatedData.total.rcy, aggregatedData.total.rly)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Service Type Performance Card */}
+            <div className={`card ${maximizedCard === 'cardService' ? 'fullscreen' : ''}`} id="cardService">
+              <div className="card-header">
+                <span>Service Type Performance</span>
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                  <button onClick={() => setPerfModalOpen(true)} className="tab active" style={{ padding: '4px 12px', background: 'rgba(255,255,255,0.25)', border: '1px solid rgba(255,255,255,0.4)', color: 'white', fontWeight: '700', borderRadius: '20px', fontSize: '10px' }}>
+                    • Performance
+                  </button>
+                  <span className="max-btn" onClick={() => toggleMax('cardService')}>
+                    {maximizedCard === 'cardService' ? '⛶ Minimize' : '⛶ Maximize'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Service tabs */}
+              <div className="tabs">
+                <button onClick={() => setCurrentTrendTab('load')} className={`tab ${currentTrendTab === 'load' ? 'active' : ''}`}>Load Trend</button>
+                <button onClick={() => setCurrentTrendTab('lab')} className={`tab ${currentTrendTab === 'lab' ? 'active' : ''}`}>Labour Trend</button>
+                <button onClick={() => setCurrentTrendTab('part')} className={`tab ${currentTrendTab === 'part' ? 'active' : ''}`}>Parts Trend</button>
+                <button onClick={() => setCurrentTrendTab('labEff')} className={`tab ${currentTrendTab === 'labEff' ? 'active' : ''}`}>Labour Per Vehicle Trend</button>
+                <button onClick={() => setCurrentTrendTab('partEff')} className={`tab ${currentTrendTab === 'partEff' ? 'active' : ''}`}>Parts Per Vehicle Trend</button>
+              </div>
+
+              <div className="table-container" style={{ maxHeight: '310px' }}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th rowSpan={2}>Service Type</th>
+                      <th rowSpan={2}>TD</th>
+                      <th colSpan={3}>{isMTD ? 'MTD' : 'RANGE'}</th>
+                      <th colSpan={3}>QTD</th>
+                      <th colSpan={3}>YTD</th>
+                    </tr>
+                    <tr>
+                      <th>CY</th>
+                      <th>LY</th>
+                      <th>Growth</th>
+                      <th>CY</th>
+                      <th>LY</th>
+                      <th>Growth</th>
+                      <th>CY</th>
+                      <th>LY</th>
+                      <th>Growth</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {categorizedServiceData && (
+                      <>
+                        {/* 1. Paid Services, Free Services, Running Repairs */}
+                        {['Paid Services', 'Free Services', 'Running Repairs'].map(gn => {
+                          const group = categorizedServiceData.groups[gn];
+                          const rows = [renderServiceRow(group.totals, true, gn)];
+                          if (trendExpandedGroups[gn] && group.items.length > 1) {
+                            const sortedItems = [...group.items].sort((a, b) => (b.cy || 0) - (a.cy || 0));
+                            sortedItems.forEach(item => {
+                              rows.push(renderServiceRow(item, false));
+                            });
+                          }
+                          return rows;
+                        })}
+
+                        {/* 2. MECH Row */}
+                        <tr className="mech-total-row">
+                          <td style={{ textAlign: 'left', fontWeight: '800' }}>MECH</td>
+                          <td>{formatServicePerformanceValue(categorizedServiceData.mech1, 'td')}</td>
+                          <td>{formatServicePerformanceValue(categorizedServiceData.mech1, 'rcy')}</td>
+                          <td>{formatServicePerformanceValue(categorizedServiceData.mech1, 'rly')}</td>
+                          <td><span className={getGrowthClass(getServiceGrowth(categorizedServiceData.mech1, 'rcy', 'rly'))}>{getServiceGrowth(categorizedServiceData.mech1, 'rcy', 'rly')}</span></td>
+                          <td>{formatServicePerformanceValue(categorizedServiceData.mech1, 'qcy')}</td>
+                          <td>{formatServicePerformanceValue(categorizedServiceData.mech1, 'qly')}</td>
+                          <td><span className={getGrowthClass(getServiceGrowth(categorizedServiceData.mech1, 'qcy', 'qly'))}>{getServiceGrowth(categorizedServiceData.mech1, 'qcy', 'qly')}</span></td>
+                          <td>{formatServicePerformanceValue(categorizedServiceData.mech1, 'ycy')}</td>
+                          <td>{formatServicePerformanceValue(categorizedServiceData.mech1, 'yly')}</td>
+                          <td><span className={getGrowthClass(getServiceGrowth(categorizedServiceData.mech1, 'ycy', 'yly'))}>{getServiceGrowth(categorizedServiceData.mech1, 'ycy', 'yly')}</span></td>
+                        </tr>
+
+                        {/* 3. Others Group */}
+                        {(() => {
+                          const group = categorizedServiceData.groups['Others'];
+                          const rows = [renderServiceRow(group.totals, true, 'Others')];
+                          if (trendExpandedGroups['Others'] && group.items.length > 1) {
+                            const sortedItems = [...group.items].sort((a, b) => (b.cy || 0) - (a.cy || 0));
+                            sortedItems.forEach(item => {
+                              rows.push(renderServiceRow(item, false));
+                            });
+                          }
+                          return rows;
+                        })()}
+
+                        {/* 4. MECH TOTAL Row */}
+                        <tr className="mech-incl-row">
+                          <td style={{ textAlign: 'left', fontWeight: '800' }}>MECH TOTAL</td>
+                          <td>{formatServicePerformanceValue(categorizedServiceData.mech2, 'td')}</td>
+                          <td>{formatServicePerformanceValue(categorizedServiceData.mech2, 'rcy')}</td>
+                          <td>{formatServicePerformanceValue(categorizedServiceData.mech2, 'rly')}</td>
+                          <td><span className={getGrowthClass(getServiceGrowth(categorizedServiceData.mech2, 'rcy', 'rly'))}>{getServiceGrowth(categorizedServiceData.mech2, 'rcy', 'rly')}</span></td>
+                          <td>{formatServicePerformanceValue(categorizedServiceData.mech2, 'qcy')}</td>
+                          <td>{formatServicePerformanceValue(categorizedServiceData.mech2, 'qly')}</td>
+                          <td><span className={getGrowthClass(getServiceGrowth(categorizedServiceData.mech2, 'qcy', 'qly'))}>{getServiceGrowth(categorizedServiceData.mech2, 'qcy', 'qly')}</span></td>
+                          <td>{formatServicePerformanceValue(categorizedServiceData.mech2, 'ycy')}</td>
+                          <td>{formatServicePerformanceValue(categorizedServiceData.mech2, 'yly')}</td>
+                          <td><span className={getGrowthClass(getServiceGrowth(categorizedServiceData.mech2, 'ycy', 'yly'))}>{getServiceGrowth(categorizedServiceData.mech2, 'ycy', 'yly')}</span></td>
+                        </tr>
+
+                        {/* 5. Accidental Group */}
+                        {(() => {
+                          const group = categorizedServiceData.groups['Accidental'];
+                          const rows = [renderServiceRow(group.totals, true, 'Accidental', 'acc-total-row')];
+                          if (trendExpandedGroups['Accidental'] && group.items.length > 1) {
+                            const sortedItems = [...group.items].sort((a, b) => (b.cy || 0) - (a.cy || 0));
+                            sortedItems.forEach(item => {
+                              rows.push(renderServiceRow(item, false));
+                            });
+                          }
+                          return rows;
+                        })()}
+
+                        {/* 6. Grand Total Row */}
+                        <tr className="total-row">
+                          <td style={{ textAlign: 'left', fontWeight: '600' }}>Grand Total</td>
+                          <td>{formatServicePerformanceValue(categorizedServiceData.total, 'td')}</td>
+                          <td>{formatServicePerformanceValue(categorizedServiceData.total, 'rcy')}</td>
+                          <td>{formatServicePerformanceValue(categorizedServiceData.total, 'rly')}</td>
+                          <td><span className={getGrowthClass(getServiceGrowth(categorizedServiceData.total, 'rcy', 'rly'))}>{getServiceGrowth(categorizedServiceData.total, 'rcy', 'rly')}</span></td>
+                          <td>{formatServicePerformanceValue(categorizedServiceData.total, 'qcy')}</td>
+                          <td>{formatServicePerformanceValue(categorizedServiceData.total, 'qly')}</td>
+                          <td><span className={getGrowthClass(getServiceGrowth(categorizedServiceData.total, 'qcy', 'qly'))}>{getServiceGrowth(categorizedServiceData.total, 'qcy', 'qly')}</span></td>
+                          <td>{formatServicePerformanceValue(categorizedServiceData.total, 'ycy')}</td>
+                          <td>{formatServicePerformanceValue(categorizedServiceData.total, 'yly')}</td>
+                          <td><span className={getGrowthClass(getServiceGrowth(categorizedServiceData.total, 'ycy', 'yly'))}>{getServiceGrowth(categorizedServiceData.total, 'ycy', 'yly')}</span></td>
+                        </tr>
+                      </>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div> {/* End grid-top */}
+
+
+
+          {/* Workshop Performance Section (Day Wise Trend Chart) */}
+          <div className={`card ${maximizedCard === 'cardDayTrend' ? 'fullscreen' : ''}`} id="cardDayTrend" style={{ marginBottom: '15px' }}>
+            <div className="card-header">
+              <span>Day Wise Trend (Current vs Last Year)</span>
+              <span className="max-btn" onClick={() => toggleMax('cardDayTrend')}>
+                {maximizedCard === 'cardDayTrend' ? '⛶ Minimize' : '⛶ Maximize'}
+              </span>
+            </div>
+
+            {/* Mode selection tabs */}
+            <div className="tabs" style={{ padding: '10px 15px', borderBottom: '1px solid var(--border)', display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'flex-start' }}>
+              <button onClick={() => setCurrentTrendMode('load')} className={`tab ${currentTrendMode === 'load' ? 'active' : ''}`}>Load Trend</button>
+              <button onClick={() => setCurrentTrendMode('lab')} className={`tab ${currentTrendMode === 'lab' ? 'active' : ''}`}>Labour Trend</button>
+              <button onClick={() => setCurrentTrendMode('part')} className={`tab ${currentTrendMode === 'part' ? 'active' : ''}`}>Parts Trend</button>
+              <button onClick={() => setCurrentTrendMode('lab_per')} className={`tab ${currentTrendMode === 'lab_per' ? 'active' : ''}`}>Labour Per Vehicle Trend</button>
+              <button onClick={() => setCurrentTrendMode('part_per')} className={`tab ${currentTrendMode === 'part_per' ? 'active' : ''}`}>Parts Per Vehicle Trend</button>
+            </div>
+
+            {/* Recharts responsive Area chart */}
+            <div className="chart-container" style={{ height: '350px', padding: '20px' }}>
+              {processedDayTrends.length > 0 && (
+                <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
+                  <LineChart data={processedDayTrends} margin={{ top: 25, right: 10, left: 0, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                    <XAxis 
+                      dataKey="day" 
+                      stroke="var(--subtext)" 
+                      tickLine={false} 
+                      tick={(props) => {
+                        const { x, y, payload } = props;
+                        const idx = parseInt(payload.value, 10) - 1;
+                        const dayName = processedDayTrends[idx]?.dayName || '';
+                        return (
+                          <g transform={`translate(${x},${y})`}>
+                            <text x={0} y={0} dy={12} textAnchor="middle" fill="var(--text)" fontSize={11} fontWeight={600}>{payload.value}</text>
+                            <text x={0} y={0} dy={26} textAnchor="middle" fill="var(--subtext)" fontSize={10} fontWeight={500}>{dayName}</text>
+                          </g>
+                        );
+                      }} 
+                    />
+                    <YAxis stroke="var(--subtext)" fontSize={10} tickLine={false} />
+                    <Tooltip 
+                      contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--text)' }} 
+                      formatter={(val) => [currentTrendMode === 'load' ? formatNumber(val) : formatCurrency(val), '']}
+                    />
+                    <Legend iconType="circle" />
+                    {trendKpis && trendKpis.fullMonthTarget > 0 && (
+                      <ReferenceLine 
+                        y={trendKpis.fullMonthTarget / 30} 
+                        stroke="#ef4444" 
+                        strokeDasharray="4 4" 
+                        strokeWidth={2}
+                      />
+                    )}
+                    <Line type="linear" name="This Year" dataKey="cy" stroke="#1e3a8a" strokeWidth={3.5} dot={{ r: 5, strokeWidth: 2.5, fill: 'var(--card)' }} activeDot={{ r: 7 }}>
+                      <LabelList dataKey="cy" position="top" style={{ fill: '#1e3a8a', fontSize: 11, fontWeight: 700 }} formatter={(val) => val > 0 ? (currentTrendMode === 'load' ? Math.round(val) : (val >= 100000 ? (val/100000).toFixed(1) + 'L' : val >= 1000 ? (val/1000).toFixed(1) + 'K' : Math.round(val))) : ''} />
+                    </Line>
+                    <Line type="linear" name="Last Year" dataKey="ly" stroke="#22c55e" strokeWidth={3} dot={{ r: 4, strokeWidth: 2, fill: 'var(--card)' }} activeDot={{ r: 6 }}>
+                      <LabelList dataKey="ly" position="bottom" style={{ fill: '#22c55e', fontSize: 11, fontWeight: 600 }} formatter={(val) => val > 0 ? (currentTrendMode === 'load' ? Math.round(val) : (val >= 100000 ? (val/100000).toFixed(1) + 'L' : val >= 1000 ? (val/1000).toFixed(1) + 'K' : Math.round(val))) : ''} />
+                    </Line>
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+
+            {/* Target & Shortfall KPI Boxes */}
+            {trendKpis && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '10px', padding: '10px', background: 'var(--table-head)' }}>
+                <div className="kpi-box">Month Target: <b>{trendKpis.isPerVehicle ? '₹' + Math.round(trendKpis.fullMonthTarget).toLocaleString() : trendKpis.isMoney ? formatCurrency(trendKpis.fullMonthTarget) : formatNumber(trendKpis.fullMonthTarget)}</b></div>
+                <div className="kpi-box">MTD Target: <b>{trendKpis.isPerVehicle ? '₹' + Math.round(trendKpis.mtdTarget).toLocaleString() : trendKpis.isMoney ? formatCurrency(trendKpis.mtdTarget) : formatNumber(trendKpis.mtdTarget)}</b></div>
+                <div className="kpi-box">Ach Till Date: <b>{trendKpis.isPerVehicle ? '₹' + Math.round(trendKpis.achieved).toLocaleString() : trendKpis.isMoney ? formatCurrency(trendKpis.achieved) : formatNumber(trendKpis.achieved)}</b></div>
+                <div className="kpi-box">Shortfall T.D: <b style={{ color: 'var(--danger)' }}>{trendKpis.isPerVehicle ? '₹' + Math.round(trendKpis.shortfallTD).toLocaleString() : trendKpis.isMoney ? formatCurrency(trendKpis.shortfallTD) : formatNumber(trendKpis.shortfallTD)}</b></div>
+                <div className="kpi-box">Monthly Shortfall: <b style={{ color: 'var(--danger)' }}>{trendKpis.isPerVehicle ? '₹' + Math.round(trendKpis.shortfallMonthly).toLocaleString() : trendKpis.isMoney ? formatCurrency(trendKpis.shortfallMonthly) : formatNumber(trendKpis.shortfallMonthly)}</b></div>
+                <div className="kpi-box">Projected Closing: <b>{trendKpis.isPerVehicle ? '₹' + Math.round(trendKpis.projectedClosing).toLocaleString() : trendKpis.isMoney ? formatCurrency(trendKpis.projectedClosing) : formatNumber(trendKpis.projectedClosing)}</b></div>
+                <div className="kpi-box">Asking Rate: <b>{trendKpis.isPerVehicle ? '₹' + Math.round(trendKpis.askingRate).toLocaleString() : trendKpis.isMoney ? formatCurrency(trendKpis.askingRate) : trendKpis.askingRate.toFixed(1)}</b></div>
+              </div>
+            )}
+          </div>
+
+          {/* Revenue Performance section */}
+          <div style={{ background: 'var(--navy)', color: 'var(--navy-text)', padding: '10px 20px', borderRadius: '8px', margin: '15px 0', fontWeight: 600, fontSize: '14px', letterSpacing: '0.5px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+            Revenue Performance
+          </div>
+
+          <div className="grid-bottom" style={{ marginBottom: '20px' }}>
+            {/* Labour Revenue Card */}
+            <div className="card rev-card">
+              <div className="card-header" style={{ padding: '8px 10px', borderBottom: '1px solid var(--border)' }}>Labour Revenue</div>
+              <table className="horizontal-table" style={{ margin: '5px 0', width: '100%', fontSize: '10px' }}>
+                <thead>
+                  <tr>
+                    <th rowSpan="2" style={{ verticalAlign: 'middle', borderBottom: '1px solid var(--border)' }}>Revenue</th>
+                    <th colSpan="3" style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>MTD</th>
+                    <th colSpan="3" style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>QTD</th>
+                    <th colSpan="3" style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>YTD</th>
+                  </tr>
+                  <tr>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>CY</th>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>LY</th>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>%</th>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>CY</th>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>LY</th>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>%</th>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>CY</th>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>LY</th>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>%</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style={{ fontWeight: '700' }}>Total</td>
+                    
+                    <td style={{ textAlign: 'center' }}>{formatCurrency(aggregatedData.total.lab_cy)}</td>
+                    <td style={{ textAlign: 'center' }}>{formatCurrency(aggregatedData.total.lab_ly)}</td>
+                    <td style={{ textAlign: 'center' }}><span className={getGrowthClass(calcGrowth(aggregatedData.total.lab_cy, aggregatedData.total.lab_ly))}>{calcGrowth(aggregatedData.total.lab_cy, aggregatedData.total.lab_ly)}</span></td>
+                    
+                    <td style={{ textAlign: 'center' }}>{formatCurrency(aggregatedData.total.lab_qcy)}</td>
+                    <td style={{ textAlign: 'center' }}>{formatCurrency(aggregatedData.total.lab_qly)}</td>
+                    <td style={{ textAlign: 'center' }}><span className={getGrowthClass(calcGrowth(aggregatedData.total.lab_qcy, aggregatedData.total.lab_qly))}>{calcGrowth(aggregatedData.total.lab_qcy, aggregatedData.total.lab_qly)}</span></td>
+                    
+                    <td style={{ textAlign: 'center' }}>{formatCurrency(aggregatedData.total.lab_ycy)}</td>
+                    <td style={{ textAlign: 'center' }}>{formatCurrency(aggregatedData.total.lab_yly)}</td>
+                    <td style={{ textAlign: 'center' }}><span className={getGrowthClass(calcGrowth(aggregatedData.total.lab_ycy, aggregatedData.total.lab_yly))}>{calcGrowth(aggregatedData.total.lab_ycy, aggregatedData.total.lab_yly)}</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            {/* Part Revenue Card */}
+            <div className="card rev-card">
+              <div className="card-header" style={{ padding: '8px 10px', borderBottom: '1px solid var(--border)' }}>Part Revenue</div>
+              <table className="horizontal-table" style={{ margin: '5px 0', width: '100%', fontSize: '10px' }}>
+                <thead>
+                  <tr>
+                    <th rowSpan="2" style={{ verticalAlign: 'middle', borderBottom: '1px solid var(--border)' }}>Revenue</th>
+                    <th colSpan="3" style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>MTD</th>
+                    <th colSpan="3" style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>QTD</th>
+                    <th colSpan="3" style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>YTD</th>
+                  </tr>
+                  <tr>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>CY</th>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>LY</th>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>%</th>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>CY</th>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>LY</th>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>%</th>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>CY</th>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>LY</th>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>%</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style={{ fontWeight: '700' }}>Total</td>
+                    
+                    <td style={{ textAlign: 'center' }}>{formatCurrency(aggregatedData.total.part_cy)}</td>
+                    <td style={{ textAlign: 'center' }}>{formatCurrency(aggregatedData.total.part_ly)}</td>
+                    <td style={{ textAlign: 'center' }}><span className={getGrowthClass(calcGrowth(aggregatedData.total.part_cy, aggregatedData.total.part_ly))}>{calcGrowth(aggregatedData.total.part_cy, aggregatedData.total.part_ly)}</span></td>
+                    
+                    <td style={{ textAlign: 'center' }}>{formatCurrency(aggregatedData.total.part_qcy)}</td>
+                    <td style={{ textAlign: 'center' }}>{formatCurrency(aggregatedData.total.part_qly)}</td>
+                    <td style={{ textAlign: 'center' }}><span className={getGrowthClass(calcGrowth(aggregatedData.total.part_qcy, aggregatedData.total.part_qly))}>{calcGrowth(aggregatedData.total.part_qcy, aggregatedData.total.part_qly)}</span></td>
+                    
+                    <td style={{ textAlign: 'center' }}>{formatCurrency(aggregatedData.total.part_ycy)}</td>
+                    <td style={{ textAlign: 'center' }}>{formatCurrency(aggregatedData.total.part_yly)}</td>
+                    <td style={{ textAlign: 'center' }}><span className={getGrowthClass(calcGrowth(aggregatedData.total.part_ycy, aggregatedData.total.part_yly))}>{calcGrowth(aggregatedData.total.part_ycy, aggregatedData.total.part_yly)}</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            {/* Growth Contribution */}
+            <div className="card rev-card" style={{ display: 'flex', flexDirection: 'column' }}>
+              <div className="card-header" style={{ padding: '8px 10px', borderBottom: '1px solid var(--border)' }}>Growth Contribution</div>
+              <div style={{ flexGrow: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '40px', padding: '10px 0' }}>
+                <div style={{ textAlign: 'center' }}>
+                  <div className={calcGrowth(aggregatedData.total.rcy, aggregatedData.total.rly).includes('-') ? 'pill neg' : 'pill pos'} style={{ padding: '5px 15px', borderRadius: '20px', fontWeight: '700', fontSize: '15px', marginBottom: '8px' }}>
+                    {calcGrowth(aggregatedData.total.rcy, aggregatedData.total.rly)}
+                  </div>
+                  <div style={{ background: 'var(--navy)', color: 'var(--navy-text)', padding: '4px 12px', borderRadius: '15px', fontSize: '9px', fontWeight: '600', whiteSpace: 'nowrap' }}>
+                    Load Growth
+                  </div>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  {categorizedServiceData && (
+                    <>
+                      <div className={getServiceGrowth(categorizedServiceData.groups['Paid Services'].totals, 'rcy', 'rly').includes('-') ? 'pill neg' : 'pill pos'} style={{ padding: '5px 15px', borderRadius: '20px', fontWeight: '700', fontSize: '15px', marginBottom: '8px' }}>
+                        {getServiceGrowth(categorizedServiceData.groups['Paid Services'].totals, 'rcy', 'rly')}
+                      </div>
+                      <div style={{ background: 'var(--success)', color: 'var(--success-text)', padding: '4px 12px', borderRadius: '15px', fontSize: '9px', fontWeight: '600', whiteSpace: 'nowrap' }}>
+                        Paid Growth
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Financial Year Performance */}
+          <div style={{ background: 'var(--navy)', color: 'var(--navy-text)', padding: '10px 20px', borderRadius: '8px', margin: '15px 0', fontWeight: 600, fontSize: '14px', letterSpacing: '0.5px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+            Financial Year Performance
+          </div>
+
+          <div className="card" id="cardFY" style={{ marginBottom: '20px' }}>
+            <div className="card-header">
+              <span>Historical FY Trends</span>
+            </div>
+            <div className="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Trends</th>
+                    {processedFyTrends && processedFyTrends.map(fy => (
+                      <th key={fy.fy} style={{ textAlign: 'center' }}>{fy.fy}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style={{ fontWeight: '600' }}>Load</td>
+                    {processedFyTrends && processedFyTrends.map(fy => (
+                      <td key={fy.fy} style={{ textAlign: 'center', color: 'var(--accent)', fontWeight: '600' }}>{formatNumber(fy.load)}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td style={{ fontWeight: '600' }}>Labour</td>
+                    {processedFyTrends && processedFyTrends.map(fy => (
+                      <td key={fy.fy} style={{ textAlign: 'center', color: 'var(--accent)', fontWeight: '600' }}>{formatCurrency(fy.labour)}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td style={{ fontWeight: '600' }}>Part</td>
+                    {processedFyTrends && processedFyTrends.map(fy => (
+                      <td key={fy.fy} style={{ textAlign: 'center', color: 'var(--accent)', fontWeight: '600' }}>{formatCurrency(fy.part)}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td style={{ fontWeight: '600' }}>Labour Per RO</td>
+                    {processedFyTrends && processedFyTrends.map(fy => (
+                      <td key={fy.fy} style={{ textAlign: 'center', color: 'var(--accent)', fontWeight: '600' }}>{fy.load > 0 ? '₹' + Math.round(fy.labour / fy.load).toLocaleString('en-IN') : '₹0'}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td style={{ fontWeight: '600' }}>Parts Per RO</td>
+                    {processedFyTrends && processedFyTrends.map(fy => (
+                      <td key={fy.fy} style={{ textAlign: 'center', color: 'var(--accent)', fontWeight: '600' }}>{fy.load > 0 ? '₹' + Math.round(fy.part / fy.load).toLocaleString('en-IN') : '₹0'}</td>
+                    ))}
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* -------------------- SECTION 2: WORKSHOP PERFORMANCE (VAS) -------------------- */}
+      {activeSection === 'vas' && aggregatedData && (
+        <div id="section-vas" className={vasMaximized ? 'fullscreen' : ''}>
+          <div style={{ background: 'var(--navy)', color: 'var(--navy-text)', padding: '10px 20px', borderRadius: '8px', marginBottom: '15px', fontWeight: 600, fontSize: '14px', letterSpacing: '0.5px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '15px' }}><button onClick={() => setVasMaximized(!vasMaximized)} style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)', color: 'white', padding: '4px 12px', borderRadius: '4px', fontSize: '11px', cursor: 'pointer', fontWeight: 'bold' }}>{vasMaximized ? 'Minimize' : 'Maximize'}</button><span>WORKSHOP REVENUE ANALYSIS</span></span>
+            
+            {/* View selectors */}
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button 
+                onClick={() => setVasViewMode(prev => prev === 'type' ? 'advisor' : 'type')} 
+                className="tab active" 
+                style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: 'white' }}
+              >
+                👤 Group: {vasViewMode === 'type' ? 'Service Type' : 'Advisor'}
+              </button>
+              <button 
+                onClick={() => setVasTypeMode(prev => prev === 'MECH' ? 'ACC' : prev === 'ACC' ? 'BOTH' : 'MECH')} 
+                className="tab active" 
+                style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: 'white' }}
+              >
+                ⚙️ Mode: {vasTypeMode}
+              </button>
+              <button 
+                onClick={() => setVasOpenRoMode(!vasOpenRoMode)} 
+                className="tab active" 
+                style={{ background: vasOpenRoMode ? 'var(--danger)' : '#2563eb', border: 'none', color: 'white', fontWeight: 'bold' }}
+              >
+                {vasOpenRoMode ? '📂 EXIT OPEN RO' : '📂 OPEN RO'}
+              </button>
+            </div>
+          </div>
+
+          
+        {vasOpenRoMode ? (
+            <div style={{ marginTop: '0' }}>
+              <div className="card" style={{ marginTop: '0', borderTopLeftRadius: '0', borderTopRightRadius: '0' }}>
+                <div style={{ background: 'var(--navy)', color: 'white', padding: '8px 20px', fontSize: '12px', fontWeight: 600, display: 'flex', justifyContent: 'space-between', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                  <span>REVENUE PERFORMANCE (VAS / WA / WB)</span>
+                  <span style={{ fontWeight: 400 }}>Live Calculation from Main Data</span>
+                </div>
+                <div className="table-container" style={{ maxHeight: '60vh' }}>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th rowSpan="2" style={{ verticalAlign: 'middle' }}>SERVICE TYPE</th>
+                        <th rowSpan="2" style={{ verticalAlign: 'middle' }}>TOTAL WIP</th>
+                        <th colSpan="4" style={{ textAlign: 'center' }}>AGING BUCKETS</th>
+                        <th rowSpan="2" style={{ verticalAlign: 'middle' }}>AVG DAYS</th>
+                      </tr>
+                      <tr>
+                        <th style={{ background: 'var(--success)', color: 'white', textAlign: 'center' }}>0-4D</th>
+                        <th style={{ background: '#eab308', color: 'white', textAlign: 'center' }}>5-7D</th>
+                        <th style={{ background: '#f97316', color: 'white', textAlign: 'center' }}>8-15D</th>
+                        <th style={{ background: 'var(--danger)', color: 'white', textAlign: 'center' }}>&gt;15D</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {['Accident', 'Running Repairs', 'Paid Service', 'Free Services', 'Others'].map(st => {
+                        const row = aggregatedOpenRo.byType[st];
+                        if (!row || row.count === 0) return null;
+                        const expanded = vasOpenRoExpandedGroups[st];
+                        
+                        return (
+                          <React.Fragment key={st}>
+                            <tr className="group-row" onClick={() => setVasOpenRoExpandedGroups(prev => ({...prev, [st]: !prev[st]}))} style={{ cursor: 'pointer' }}>
+                              <td style={{ textAlign: 'center', fontWeight: '700' }}>
+                                <span className={`group-icon ${expanded ? 'expanded' : ''}`} style={{ display: 'inline-block', width: '12px', transition: 'transform 0.2s', fontSize: '8px', marginRight: '5px', transform: expanded ? 'rotate(90deg)' : 'none' }}>▶</span>
+                                {st}
+                              </td>
+                              <td style={{ textAlign: 'center', fontWeight: '700' }}>{row.count}</td>
+                              <td style={{ textAlign: 'center', color: 'var(--success)', fontWeight: '600' }}>{row.d0_4 > 0 ? row.d0_4 : 0}</td>
+                              <td style={{ textAlign: 'center', color: '#eab308', fontWeight: '600' }}>{row.d5_7 > 0 ? row.d5_7 : 0}</td>
+                              <td style={{ textAlign: 'center', color: '#f97316', fontWeight: '600' }}>{row.d8_15 > 0 ? row.d8_15 : 0}</td>
+                              <td style={{ textAlign: 'center', color: 'var(--danger)', fontWeight: '600' }}>{row.d15_plus > 0 ? row.d15_plus : 0}</td>
+                              <td style={{ textAlign: 'center', fontWeight: '600' }}>{(row.totalDays / row.count).toFixed(1)}</td>
+                            </tr>
+                            {expanded && row.items.map(it => {
+                               const textStr = `${it.delay_reason} Receiving Date : ${it.created_date?.value || it.created_date || '-'} PTD : - Claim date : - ${it.action_taken ? 'Action: '+it.action_taken : ''}`;
+                               return (
+                                  <tr key={it.jc_number} className="child-row" style={{ cursor: 'pointer' }} onClick={() => setSelectedVehicleDetails(it)}>
+                                    <td style={{ textAlign: 'right', paddingRight: '20px', color: '#3b82f6', fontSize: '11px' }}>
+                                      {it.reg_no} ({it.model})
+                                    </td>
+                                    <td colSpan="5" style={{ textAlign: 'left', fontSize: '10px', color: '#6b7280' }}>
+                                      <span style={{ color: '#f59e0b', marginRight: '5px' }}>⚠️</span>
+                                      {textStr}
+                                    </td>
+                                    <td style={{ textAlign: 'center', fontSize: '11px' }}>{it.open_days}D</td>
+                                  </tr>
+                               );
+                            })}
+                          </React.Fragment>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div className="card" style={{ marginTop: '20px' }}>
+                <div style={{ background: 'var(--navy)', color: 'white', padding: '10px 20px', fontSize: '13px', fontWeight: 700, borderRadius: '8px 8px 0 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '16px' }}>📉</span> JOB CARD DELAY REASON SUMMARY
+                </div>
+                <div className="table-container">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>JOB CARD DELAY REASON</th>
+                        <th>MECH COUNT</th>
+                        <th>ACC COUNT</th>
+                        <th>0-4D</th>
+                        <th>5-7D</th>
+                        <th>8-15D</th>
+                        <th>&gt;15D</th>
+                        <th>TOTAL</th>
+                        <th>AVG DAYS</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {aggregatedOpenRo.byReason.map(r => (
+                        <tr key={r.reason}>
+                          <td style={{ textAlign: 'left', fontWeight: '600', paddingLeft: '20px' }}>{r.reason}</td>
+                          <td style={{ textAlign: 'center' }}>{r.mech}</td>
+                          <td style={{ textAlign: 'center' }}>{r.acc}</td>
+                          <td style={{ textAlign: 'center', color: 'var(--success)' }}>{r.d0_4}</td>
+                          <td style={{ textAlign: 'center', color: '#eab308' }}>{r.d5_7}</td>
+                          <td style={{ textAlign: 'center', color: '#f97316' }}>{r.d8_15}</td>
+                          <td style={{ textAlign: 'center', color: 'var(--danger)' }}>{r.d15_plus}</td>
+                          <td style={{ textAlign: 'center', fontWeight: '700' }}>{r.count}</td>
+                          <td style={{ textAlign: 'center', color: 'var(--danger)', fontWeight: '600' }}>{(r.totalDays / r.count).toFixed(1)}D</td>
+                        </tr>
+                      ))}
+                      {aggregatedOpenRo.reasonTotalRow && (
+                        <tr style={{ background: '#f8fafc', fontWeight: 'bold' }}>
+                          <td style={{ textAlign: 'left', paddingLeft: '20px' }}>GRAND TOTAL</td>
+                          <td style={{ textAlign: 'center' }}>{aggregatedOpenRo.reasonTotalRow.mech}</td>
+                          <td style={{ textAlign: 'center' }}>{aggregatedOpenRo.reasonTotalRow.acc}</td>
+                          <td style={{ textAlign: 'center' }}>{aggregatedOpenRo.reasonTotalRow.d0_4}</td>
+                          <td style={{ textAlign: 'center' }}>{aggregatedOpenRo.reasonTotalRow.d5_7}</td>
+                          <td style={{ textAlign: 'center' }}>{aggregatedOpenRo.reasonTotalRow.d8_15}</td>
+                          <td style={{ textAlign: 'center' }}>{aggregatedOpenRo.reasonTotalRow.d15_plus}</td>
+                          <td style={{ textAlign: 'center', color: '#3b82f6' }}>{aggregatedOpenRo.reasonTotalRow.mech + aggregatedOpenRo.reasonTotalRow.acc}</td>
+                          <td style={{ textAlign: 'center', color: '#3b82f6' }}>{(aggregatedOpenRo.reasonTotalRow.totalDays / (aggregatedOpenRo.reasonTotalRow.mech + aggregatedOpenRo.reasonTotalRow.acc || 1)).toFixed(1)}D</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+        ) : (
+
+          <div className="card" style={{ marginTop: '0', borderTopLeftRadius: '0', borderTopRightRadius: '0' }}>
+            
+            {/* Subheader */}
+            <div style={{ background: 'var(--navy)', color: 'white', padding: '8px 20px', fontSize: '12px', fontWeight: 600, display: 'flex', justifyContent: 'space-between', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+              <span>REVENUE PERFORMANCE (VAS / WA / WB)</span>
+              <span style={{ fontWeight: 400 }}>Live Calculation from Main Data</span>
+            </div>
+
+            <div className="table-container" style={{ maxHeight: '70vh' }}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>{vasViewMode === 'type' ? 'SERVICE TYPE' : 'SERVICE ADVISOR'}</th>
+                    <th>TOTAL JC</th>
+                    <th>TOTAL JC %</th>
+                    <th>Labour Amt</th>
+                    <th>LABOUR %</th>
+                    <th>LABOUR/RO</th>
+                    <th>LESS VAS.</th>
+                    <th>VAS %</th>
+                    <th>LAB/RO(-VAS)</th>
+                    <th>LAB(-VAS)</th>
+                    <th>Spare Sale</th>
+                    <th>SPARE/RO</th>
+                    <th>Discount</th>
+                    <th>WA Count</th>
+                    <th>WA AMT</th>
+                    <th>WA/RO %</th>
+                    <th>WB Count</th>
+                    <th>WB AMT</th>
+                    <th>WB/RO %</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  
+                  {/* Rendering advisor view mode */}
+                  {vasViewMode === 'advisor' && vasTableData && vasTableData.sortedKeys.map(saName => {
+                    const g = vasTableData.grouped[saName].totals;
+                    const totJc = aggregatedData.total.cy || 1;
+                    const totLab = aggregatedData.total.lab_cy || 1;
+                    const expanded = vasExpandedGroups[saName];
+
+                    return (
+                      <>
+                        <tr 
+                          key={saName} 
+                          className="group-row" 
+                          onClick={() => setVasExpandedGroups(prev => ({ ...prev, [saName]: !prev[saName] }))}
+                        >
+                          <td style={{ textAlign: 'left', fontWeight: '700' }}>
+                            <span className={`group-icon ${expanded ? 'expanded' : ''}`}>▶</span>{saName}
+                          </td>
+                          <td>{formatNumber(g.cy)}</td>
+                          <td>{((g.cy / totJc) * 100).toFixed(0)}%</td>
+                          <td>{formatCurrency(g.lab_cy)}</td>
+                          <td>{((g.lab_cy / totLab) * 100).toFixed(0)}%</td>
+                          <td>{g.cy > 0 ? '₹' + Math.round(g.lab_cy / g.cy).toLocaleString() : '₹0'}</td>
+                          <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(g.vas_cy)}</td>
+                          <td style={{ color: getPctColor(g.lab_cy > 0 ? ((g.vas_cy / g.lab_cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{g.lab_cy > 0 ? ((g.vas_cy / g.lab_cy) * 100).toFixed(0) : 0}%</td>
+                          <td>{g.cy > 0 ? '₹' + Math.round((g.lab_cy - g.vas_cy) / g.cy).toLocaleString() : '₹0'}</td>
+                          <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(g.lab_cy - g.vas_cy)}</td>
+                          <td>{formatCurrency(g.part_cy)}</td>
+                          <td>{g.cy > 0 ? '₹' + Math.round(g.part_cy / g.cy).toLocaleString() : '₹0'}</td>
+                          <td style={{ color: 'var(--danger)', fontWeight: '700' }}>{formatCurrency(g.disc_cy)}</td>
+                          <td>{formatNumber(g.wa_count_cy)}</td>
+                          <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(g.wa_cy)}</td>
+                          <td style={{ color: getPctColor(g.cy > 0 ? ((g.wa_count_cy / g.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{g.cy > 0 ? ((g.wa_count_cy / g.cy) * 100).toFixed(0) : 0}%</td>
+                          <td>{formatNumber(g.wb_count_cy)}</td>
+                          <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(g.wb_cy)}</td>
+                          <td style={{ color: getPctColor(g.cy > 0 ? ((g.wb_count_cy / g.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{g.cy > 0 ? ((g.wb_count_cy / g.cy) * 100).toFixed(0) : 0}%</td>
+                        </tr>
+                        {expanded && vasTableData.grouped[saName].items.map(child => (
+                          <tr key={child.Location} className="child-row">
+                            <td style={{ textAlign: 'left', paddingLeft: '25px' }}>{child.Location}</td>
+                            <td>{formatNumber(child.cy)}</td>
+                            <td>{((child.cy / totJc) * 100).toFixed(0)}%</td>
+                            <td>{formatCurrency(child.lab_cy)}</td>
+                            <td>{((child.lab_cy / totLab) * 100).toFixed(0)}%</td>
+                            <td>{child.cy > 0 ? '₹' + Math.round(child.lab_cy / child.cy).toLocaleString() : '₹0'}</td>
+                            <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(child.vas_cy)}</td>
+                            <td style={{ color: getPctColor(child.lab_cy > 0 ? ((child.vas_cy / child.lab_cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{child.lab_cy > 0 ? ((child.vas_cy / child.lab_cy) * 100).toFixed(0) : 0}%</td>
+                            <td>{child.cy > 0 ? '₹' + Math.round((child.lab_cy - child.vas_cy) / child.cy).toLocaleString() : '₹0'}</td>
+                            <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(child.lab_cy - child.vas_cy)}</td>
+                            <td>{formatCurrency(child.part_cy)}</td>
+                            <td>{child.cy > 0 ? '₹' + Math.round(child.part_cy / child.cy).toLocaleString() : '₹0'}</td>
+                            <td style={{ color: 'var(--danger)', fontWeight: '700' }}>{formatCurrency(child.disc_cy)}</td>
+                            <td>{formatNumber(child.wa_count_cy)}</td>
+                            <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(child.wa_cy)}</td>
+                            <td style={{ color: getPctColor(child.cy > 0 ? ((child.wa_count_cy / child.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{child.cy > 0 ? ((child.wa_count_cy / child.cy) * 100).toFixed(0) : 0}%</td>
+                            <td>{formatNumber(child.wb_count_cy)}</td>
+                            <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(child.wb_cy)}</td>
+                            <td style={{ color: getPctColor(child.cy > 0 ? ((child.wb_count_cy / child.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{child.cy > 0 ? ((child.wb_count_cy / child.cy) * 100).toFixed(0) : 0}%</td>
+                          </tr>
+                        ))}
+                      </>
+                    );
+                  })}
+
+                  {/* Rendering standard category view mode */}
+                  {vasViewMode === 'type' && vasTableData && (
+                    <>
+                      {['Paid Services', 'Free Services', 'Running Repairs'].map(gn => {
+                        const g = vasTableData.grouped[gn].totals;
+                        const totJc = aggregatedData.total.cy || 1;
+                        const totLab = aggregatedData.total.lab_cy || 1;
+                        const expanded = vasExpandedGroups[gn];
+
+                        return (
+                          <>
+                            <tr 
+                              key={gn} 
+                              className="group-row" 
+                              onClick={() => setVasExpandedGroups(prev => ({ ...prev, [gn]: !prev[gn] }))}
+                            >
+                              <td style={{ textAlign: 'left', fontWeight: '700' }}>
+                                <span className={`group-icon ${expanded ? 'expanded' : ''}`}>▶</span>{gn}
+                              </td>
+                              <td>{formatNumber(g.cy)}</td>
+                              <td>{((g.cy / totJc) * 100).toFixed(0)}%</td>
+                              <td>{formatCurrency(g.lab_cy)}</td>
+                              <td>{((g.lab_cy / totLab) * 100).toFixed(0)}%</td>
+                              <td>{g.cy > 0 ? '₹' + Math.round(g.lab_cy / g.cy).toLocaleString() : '₹0'}</td>
+                              <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(g.vas_cy)}</td>
+                              <td style={{ color: getPctColor(g.lab_cy > 0 ? ((g.vas_cy / g.lab_cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{g.lab_cy > 0 ? ((g.vas_cy / g.lab_cy) * 100).toFixed(0) : 0}%</td>
+                              <td>{g.cy > 0 ? '₹' + Math.round((g.lab_cy - g.vas_cy) / g.cy).toLocaleString() : '₹0'}</td>
+                              <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(g.lab_cy - g.vas_cy)}</td>
+                              <td>{formatCurrency(g.part_cy)}</td>
+                              <td>{g.cy > 0 ? '₹' + Math.round(g.part_cy / g.cy).toLocaleString() : '₹0'}</td>
+                              <td style={{ color: 'var(--danger)', fontWeight: '700' }}>{formatCurrency(g.disc_cy)}</td>
+                              <td>{formatNumber(g.wa_count_cy)}</td>
+                              <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(g.wa_cy)}</td>
+                              <td style={{ color: getPctColor(g.cy > 0 ? ((g.wa_count_cy / g.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{g.cy > 0 ? ((g.wa_count_cy / g.cy) * 100).toFixed(0) : 0}%</td>
+                              <td>{formatNumber(g.wb_count_cy)}</td>
+                              <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(g.wb_cy)}</td>
+                              <td style={{ color: getPctColor(g.cy > 0 ? ((g.wb_count_cy / g.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{g.cy > 0 ? ((g.wb_count_cy / g.cy) * 100).toFixed(0) : 0}%</td>
+                            </tr>
+                            {expanded && vasTableData.grouped[gn].items.map(child => (
+                              <tr key={child.Location} className="child-row">
+                                <td style={{ textAlign: 'left', paddingLeft: '25px' }}>{child.Location}</td>
+                                <td>{formatNumber(child.cy)}</td>
+                                <td>{((child.cy / totJc) * 100).toFixed(0)}%</td>
+                                <td>{formatCurrency(child.lab_cy)}</td>
+                                <td>{((child.lab_cy / totLab) * 100).toFixed(0)}%</td>
+                                <td>{child.cy > 0 ? '₹' + Math.round(child.lab_cy / child.cy).toLocaleString() : '₹0'}</td>
+                                <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(child.vas_cy)}</td>
+                                <td style={{ color: getPctColor(child.lab_cy > 0 ? ((child.vas_cy / child.lab_cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{child.lab_cy > 0 ? ((child.vas_cy / child.lab_cy) * 100).toFixed(0) : 0}%</td>
+                                <td>{child.cy > 0 ? '₹' + Math.round((child.lab_cy - child.vas_cy) / child.cy).toLocaleString() : '₹0'}</td>
+                                <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(child.lab_cy - child.vas_cy)}</td>
+                                <td>{formatCurrency(child.part_cy)}</td>
+                                <td>{child.cy > 0 ? '₹' + Math.round(child.part_cy / child.cy).toLocaleString() : '₹0'}</td>
+                                <td style={{ color: 'var(--danger)', fontWeight: '700' }}>{formatCurrency(child.disc_cy)}</td>
+                                <td>{formatNumber(child.wa_count_cy)}</td>
+                                <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(child.wa_cy)}</td>
+                                <td style={{ color: getPctColor(child.cy > 0 ? ((child.wa_count_cy / child.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{child.cy > 0 ? ((child.wa_count_cy / child.cy) * 100).toFixed(0) : 0}%</td>
+                                <td>{formatNumber(child.wb_count_cy)}</td>
+                                <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(child.wb_cy)}</td>
+                                <td style={{ color: getPctColor(child.cy > 0 ? ((child.wb_count_cy / child.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{child.cy > 0 ? ((child.wb_count_cy / child.cy) * 100).toFixed(0) : 0}%</td>
+                              </tr>
+                            ))}
+                          </>
+                        );
+                      })}
+
+                      {/* Mechanical subtotal */}
+                      <tr className="mech-total-row">
+                        <td style={{ textAlign: 'left', fontWeight: '800' }}>MECHANICAL TOTAL</td>
+                        <td>{formatNumber(vasTableData.mech1.cy)}</td>
+                        <td>{((vasTableData.mech1.cy / (aggregatedData.total.cy || 1)) * 100).toFixed(0)}%</td>
+                        <td>{formatCurrency(vasTableData.mech1.lab_cy)}</td>
+                        <td>{((vasTableData.mech1.lab_cy / (aggregatedData.total.lab_cy || 1)) * 100).toFixed(0)}%</td>
+                        <td>{vasTableData.mech1.cy > 0 ? '₹' + Math.round(vasTableData.mech1.lab_cy / vasTableData.mech1.cy).toLocaleString() : '₹0'}</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.mech1.vas_cy)}</td>
+                        <td style={{ color: getPctColor(vasTableData.mech1.lab_cy > 0 ? ((vasTableData.mech1.vas_cy / vasTableData.mech1.lab_cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{vasTableData.mech1.lab_cy > 0 ? ((vasTableData.mech1.vas_cy / vasTableData.mech1.lab_cy) * 100).toFixed(0) : 0}%</td>
+                        <td>{vasTableData.mech1.cy > 0 ? '₹' + Math.round((vasTableData.mech1.lab_cy - vasTableData.mech1.vas_cy) / vasTableData.mech1.cy).toLocaleString() : '₹0'}</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.mech1.lab_cy - vasTableData.mech1.vas_cy)}</td>
+                        <td>{formatCurrency(vasTableData.mech1.part_cy)}</td>
+                        <td>{vasTableData.mech1.cy > 0 ? '₹' + Math.round(vasTableData.mech1.part_cy / vasTableData.mech1.cy).toLocaleString() : '₹0'}</td>
+                        <td style={{ color: 'var(--danger)', fontWeight: '700' }}>{formatCurrency(vasTableData.mech1.disc_cy)}</td>
+                        <td>{formatNumber(vasTableData.mech1.wa_count_cy)}</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.mech1.wa_cy)}</td>
+                        <td style={{ color: getPctColor(vasTableData.mech1.cy > 0 ? ((vasTableData.mech1.wa_count_cy / vasTableData.mech1.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{vasTableData.mech1.cy > 0 ? ((vasTableData.mech1.wa_count_cy / vasTableData.mech1.cy) * 100).toFixed(0) : 0}%</td>
+                        <td>{formatNumber(vasTableData.mech1.wb_count_cy)}</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.mech1.wb_cy)}</td>
+                        <td style={{ color: getPctColor(vasTableData.mech1.cy > 0 ? ((vasTableData.mech1.wb_count_cy / vasTableData.mech1.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{vasTableData.mech1.cy > 0 ? ((vasTableData.mech1.wb_count_cy / vasTableData.mech1.cy) * 100).toFixed(0) : 0}%</td>
+                      </tr>
+
+                      {/* Others Row */}
+                      <tr className="group-row" onClick={() => setVasExpandedGroups(prev => ({ ...prev, Others: !prev.Others }))}>
+                        <td style={{ textAlign: 'left', fontWeight: '700' }}>
+                          <span className={`group-icon ${vasExpandedGroups.Others ? 'expanded' : ''}`}>▶</span>Others
+                        </td>
+                        <td>{formatNumber(vasTableData.grouped['Others'].totals.cy)}</td>
+                        <td>{((vasTableData.grouped['Others'].totals.cy / (aggregatedData.total.cy || 1)) * 100).toFixed(0)}%</td>
+                        <td>{formatCurrency(vasTableData.grouped['Others'].totals.lab_cy)}</td>
+                        <td>{((vasTableData.grouped['Others'].totals.lab_cy / (aggregatedData.total.lab_cy || 1)) * 100).toFixed(0)}%</td>
+                        <td>{vasTableData.grouped['Others'].totals.cy > 0 ? '₹' + Math.round(vasTableData.grouped['Others'].totals.lab_cy / vasTableData.grouped['Others'].totals.cy).toLocaleString() : '₹0'}</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.grouped['Others'].totals.vas_cy)}</td>
+                        <td style={{ color: getPctColor(vasTableData.grouped['Others'].totals.lab_cy > 0 ? ((vasTableData.grouped['Others'].totals.vas_cy / vasTableData.grouped['Others'].totals.lab_cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{vasTableData.grouped['Others'].totals.lab_cy > 0 ? ((vasTableData.grouped['Others'].totals.vas_cy / vasTableData.grouped['Others'].totals.lab_cy) * 100).toFixed(0) : 0}%</td>
+                        <td>{vasTableData.grouped['Others'].totals.cy > 0 ? '₹' + Math.round((vasTableData.grouped['Others'].totals.lab_cy - vasTableData.grouped['Others'].totals.vas_cy) / vasTableData.grouped['Others'].totals.cy).toLocaleString() : '₹0'}</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.grouped['Others'].totals.lab_cy - vasTableData.grouped['Others'].totals.vas_cy)}</td>
+                        <td>{formatCurrency(vasTableData.grouped['Others'].totals.part_cy)}</td>
+                        <td>{vasTableData.grouped['Others'].totals.cy > 0 ? '₹' + Math.round(vasTableData.grouped['Others'].totals.part_cy / vasTableData.grouped['Others'].totals.cy).toLocaleString() : '₹0'}</td>
+                        <td style={{ color: 'var(--danger)', fontWeight: '700' }}>{formatCurrency(vasTableData.grouped['Others'].totals.disc_cy)}</td>
+                        <td>{formatNumber(vasTableData.grouped['Others'].totals.wa_count_cy)}</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.grouped['Others'].totals.wa_cy)}</td>
+                        <td style={{ color: getPctColor(vasTableData.grouped['Others'].totals.cy > 0 ? ((vasTableData.grouped['Others'].totals.wa_count_cy / vasTableData.grouped['Others'].totals.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{vasTableData.grouped['Others'].totals.cy > 0 ? ((vasTableData.grouped['Others'].totals.wa_count_cy / vasTableData.grouped['Others'].totals.cy) * 100).toFixed(0) : 0}%</td>
+                        <td>{formatNumber(vasTableData.grouped['Others'].totals.wb_count_cy)}</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.grouped['Others'].totals.wb_cy)}</td>
+                        <td style={{ color: getPctColor(vasTableData.grouped['Others'].totals.cy > 0 ? ((vasTableData.grouped['Others'].totals.wb_count_cy / vasTableData.grouped['Others'].totals.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{vasTableData.grouped['Others'].totals.cy > 0 ? ((vasTableData.grouped['Others'].totals.wb_count_cy / vasTableData.grouped['Others'].totals.cy) * 100).toFixed(0) : 0}%</td>
+                      </tr>
+
+                      {/* Mech Total (Incl. Others) row */}
+                      <tr className="mech-incl-row">
+                        <td style={{ textAlign: 'left', fontWeight: '800' }}>MECHANICAL TOTAL (INCL. OTHERS)</td>
+                        <td>{formatNumber(vasTableData.mech2.cy)}</td>
+                        <td>{((vasTableData.mech2.cy / (aggregatedData.total.cy || 1)) * 100).toFixed(0)}%</td>
+                        <td>{formatCurrency(vasTableData.mech2.lab_cy)}</td>
+                        <td>{((vasTableData.mech2.lab_cy / (aggregatedData.total.lab_cy || 1)) * 100).toFixed(0)}%</td>
+                        <td>{vasTableData.mech2.cy > 0 ? '₹' + Math.round(vasTableData.mech2.lab_cy / vasTableData.mech2.cy).toLocaleString() : '₹0'}</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.mech2.vas_cy)}</td>
+                        <td style={{ color: getPctColor(vasTableData.mech2.lab_cy > 0 ? ((vasTableData.mech2.vas_cy / vasTableData.mech2.lab_cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{vasTableData.mech2.lab_cy > 0 ? ((vasTableData.mech2.vas_cy / vasTableData.mech2.lab_cy) * 100).toFixed(0) : 0}%</td>
+                        <td>{vasTableData.mech2.cy > 0 ? '₹' + Math.round((vasTableData.mech2.lab_cy - vasTableData.mech2.vas_cy) / vasTableData.mech2.cy).toLocaleString() : '₹0'}</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.mech2.lab_cy - vasTableData.mech2.vas_cy)}</td>
+                        <td>{formatCurrency(vasTableData.mech2.part_cy)}</td>
+                        <td>{vasTableData.mech2.cy > 0 ? '₹' + Math.round(vasTableData.mech2.part_cy / vasTableData.mech2.cy).toLocaleString() : '₹0'}</td>
+                        <td style={{ color: 'var(--danger)', fontWeight: '700' }}>{formatCurrency(vasTableData.mech2.disc_cy)}</td>
+                        <td>{formatNumber(vasTableData.mech2.wa_count_cy)}</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.mech2.wa_cy)}</td>
+                        <td style={{ color: getPctColor(vasTableData.mech2.cy > 0 ? ((vasTableData.mech2.wa_count_cy / vasTableData.mech2.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{vasTableData.mech2.cy > 0 ? ((vasTableData.mech2.wa_count_cy / vasTableData.mech2.cy) * 100).toFixed(0) : 0}%</td>
+                        <td>{formatNumber(vasTableData.mech2.wb_count_cy)}</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.mech2.wb_cy)}</td>
+                        <td style={{ color: getPctColor(vasTableData.mech2.cy > 0 ? ((vasTableData.mech2.wb_count_cy / vasTableData.mech2.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{vasTableData.mech2.cy > 0 ? ((vasTableData.mech2.wb_count_cy / vasTableData.mech2.cy) * 100).toFixed(0) : 0}%</td>
+                      </tr>
+
+                      {/* Accidental Row */}
+                      <tr className="group-row acc-total-row" onClick={() => setVasExpandedGroups(prev => ({ ...prev, Accidental: !prev.Accidental }))}>
+                        <td style={{ textAlign: 'left', fontWeight: '800' }}>
+                          <span className={`group-icon ${vasExpandedGroups.Accidental ? 'expanded' : ''}`}>▶</span>ACCIDENTAL
+                        </td>
+                        <td>{formatNumber(vasTableData.grouped['Accidental'].totals.cy)}</td>
+                        <td>{((vasTableData.grouped['Accidental'].totals.cy / (aggregatedData.total.cy || 1)) * 100).toFixed(0)}%</td>
+                        <td>{formatCurrency(vasTableData.grouped['Accidental'].totals.lab_cy)}</td>
+                        <td>{((vasTableData.grouped['Accidental'].totals.lab_cy / (aggregatedData.total.lab_cy || 1)) * 100).toFixed(0)}%</td>
+                        <td>{vasTableData.grouped['Accidental'].totals.cy > 0 ? '₹' + Math.round(vasTableData.grouped['Accidental'].totals.lab_cy / vasTableData.grouped['Accidental'].totals.cy).toLocaleString() : '₹0'}</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.grouped['Accidental'].totals.vas_cy)}</td>
+                        <td style={{ color: getPctColor(vasTableData.grouped['Accidental'].totals.lab_cy > 0 ? ((vasTableData.grouped['Accidental'].totals.vas_cy / vasTableData.grouped['Accidental'].totals.lab_cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{vasTableData.grouped['Accidental'].totals.lab_cy > 0 ? ((vasTableData.grouped['Accidental'].totals.vas_cy / vasTableData.grouped['Accidental'].totals.lab_cy) * 100).toFixed(0) : 0}%</td>
+                        <td>{vasTableData.grouped['Accidental'].totals.cy > 0 ? '₹' + Math.round((vasTableData.grouped['Accidental'].totals.lab_cy - vasTableData.grouped['Accidental'].totals.vas_cy) / vasTableData.grouped['Accidental'].totals.cy).toLocaleString() : '₹0'}</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.grouped['Accidental'].totals.lab_cy - vasTableData.grouped['Accidental'].totals.vas_cy)}</td>
+                        <td>{formatCurrency(vasTableData.grouped['Accidental'].totals.part_cy)}</td>
+                        <td>{vasTableData.grouped['Accidental'].totals.cy > 0 ? '₹' + Math.round(vasTableData.grouped['Accidental'].totals.part_cy / vasTableData.grouped['Accidental'].totals.cy).toLocaleString() : '₹0'}</td>
+                        <td style={{ color: 'var(--danger)', fontWeight: '700' }}>{formatCurrency(vasTableData.grouped['Accidental'].totals.disc_cy)}</td>
+                        <td>{formatNumber(vasTableData.grouped['Accidental'].totals.wa_count_cy)}</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.grouped['Accidental'].totals.wa_cy)}</td>
+                        <td style={{ color: getPctColor(vasTableData.grouped['Accidental'].totals.cy > 0 ? ((vasTableData.grouped['Accidental'].totals.wa_count_cy / vasTableData.grouped['Accidental'].totals.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{vasTableData.grouped['Accidental'].totals.cy > 0 ? ((vasTableData.grouped['Accidental'].totals.wa_count_cy / vasTableData.grouped['Accidental'].totals.cy) * 100).toFixed(0) : 0}%</td>
+                        <td>{formatNumber(vasTableData.grouped['Accidental'].totals.wb_count_cy)}</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.grouped['Accidental'].totals.wb_cy)}</td>
+                        <td style={{ color: getPctColor(vasTableData.grouped['Accidental'].totals.cy > 0 ? ((vasTableData.grouped['Accidental'].totals.wb_count_cy / vasTableData.grouped['Accidental'].totals.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{vasTableData.grouped['Accidental'].totals.cy > 0 ? ((vasTableData.grouped['Accidental'].totals.wb_count_cy / vasTableData.grouped['Accidental'].totals.cy) * 100).toFixed(0) : 0}%</td>
+                      </tr>
+
+                      {/* Grand Total Row */}
+                      <tr className="total-row">
+                        <td style={{ textAlign: 'left', fontWeight: '600' }}>GRAND TOTAL</td>
+                        <td>{formatNumber(vasTableData.totals.cy)}</td>
+                        <td>100%</td>
+                        <td>{formatCurrency(vasTableData.totals.lab_cy)}</td>
+                        <td>100%</td>
+                        <td>{vasTableData.totals.cy > 0 ? '₹' + Math.round(vasTableData.totals.lab_cy / vasTableData.totals.cy).toLocaleString() : '₹0'}</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.totals.vas_cy)}</td>
+                        <td style={{ color: getPctColor(vasTableData.totals.lab_cy > 0 ? ((vasTableData.totals.vas_cy / vasTableData.totals.lab_cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{vasTableData.totals.lab_cy > 0 ? ((vasTableData.totals.vas_cy / vasTableData.totals.lab_cy) * 100).toFixed(0) : 0}%</td>
+                        <td>{vasTableData.totals.cy > 0 ? '₹' + Math.round((vasTableData.totals.lab_cy - vasTableData.totals.vas_cy) / vasTableData.totals.cy).toLocaleString() : '₹0'}</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.totals.lab_cy - vasTableData.totals.vas_cy)}</td>
+                        <td>{formatCurrency(vasTableData.totals.part_cy)}</td>
+                        <td>{vasTableData.totals.cy > 0 ? '₹' + Math.round(vasTableData.totals.part_cy / vasTableData.totals.cy).toLocaleString() : '₹0'}</td>
+                        <td style={{ color: 'var(--danger)', fontWeight: '700' }}>{formatCurrency(vasTableData.totals.disc_cy)}</td>
+                        <td>{formatNumber(vasTableData.totals.wa_count_cy)}</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.totals.wa_cy)}</td>
+                        <td style={{ color: getPctColor(vasTableData.totals.cy > 0 ? ((vasTableData.totals.wa_count_cy / vasTableData.totals.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{vasTableData.totals.cy > 0 ? ((vasTableData.totals.wa_count_cy / vasTableData.totals.cy) * 100).toFixed(0) : 0}%</td>
+                        <td>{formatNumber(vasTableData.totals.wb_count_cy)}</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.totals.wb_cy)}</td>
+                        <td style={{ color: getPctColor(vasTableData.totals.cy > 0 ? ((vasTableData.totals.wb_count_cy / vasTableData.totals.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{vasTableData.totals.cy > 0 ? ((vasTableData.totals.wb_count_cy / vasTableData.totals.cy) * 100).toFixed(0) : 0}%</td>
+                      </tr>
+                    </>
+                  )}
+                </tbody>
+              </table>
+              </div>
+            </div>
+          )}
+
+          {/* Location Summary Table */}
+          <div className="card" style={{ marginBottom: '15px', borderTopLeftRadius: '0', borderTopRightRadius: '0' }}>
+            <div className="table-container">
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr>
+                    <th style={{ textAlign: 'left', background: 'white', color: 'var(--navy)', fontWeight: 'bold' }}>LOCATION</th>
+                    <th style={{ background: 'white', color: 'var(--navy)', fontWeight: 'bold' }}>TOTAL LOAD</th>
+                    <th style={{ background: 'white', color: 'var(--navy)', fontWeight: 'normal' }}>EW</th>
+                    <th style={{ background: 'white', color: 'var(--navy)', fontWeight: 'normal' }}>EW %</th>
+                    <th style={{ background: 'white', color: 'var(--navy)', fontWeight: 'normal' }}>RSA</th>
+                    <th style={{ background: 'white', color: 'var(--navy)', fontWeight: 'normal' }}>RSA %</th>
+                    <th style={{ background: 'white', color: 'var(--navy)', fontWeight: 'normal' }}>AMC</th>
+                    <th style={{ background: 'white', color: 'var(--navy)', fontWeight: 'normal' }}>AMC%</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {aggregatedData && aggregatedData.locs ? aggregatedData.locs.map(loc => (
+                    <tr key={loc.Location} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                      <td style={{ textAlign: 'left', fontWeight: 'bold', color: 'black' }}>{loc.Location}</td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                  )) : ['JAMMU', 'KATHUA', 'SAMBA', 'POONCH'].map(loc => (
+                    <tr key={loc} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                      <td style={{ textAlign: 'left', fontWeight: 'bold', color: 'black' }}>{loc}</td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                  ))}
+                  <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
+                    <td style={{ textAlign: 'left', fontWeight: 'bold', color: 'black' }}>GTOTAL</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
           </div>
