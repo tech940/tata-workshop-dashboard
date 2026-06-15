@@ -1837,9 +1837,9 @@ export default function Home() {
 
       {/* -------------------- SECTION 2: WORKSHOP PERFORMANCE (VAS) -------------------- */}
       {activeSection === 'vas' && aggregatedData && (
-        <div id="section-vas">
+        <div id="section-vas" className={vasMaximized ? 'fullscreen' : ''}>
           <div style={{ background: 'var(--navy)', color: 'var(--navy-text)', padding: '10px 20px', borderRadius: '8px', marginBottom: '15px', fontWeight: 600, fontSize: '14px', letterSpacing: '0.5px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span>WORKSHOP REVENUE ANALYSIS</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '15px' }}><button onClick={() => setVasMaximized(!vasMaximized)} style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)', color: 'white', padding: '4px 12px', borderRadius: '4px', fontSize: '11px', cursor: 'pointer', fontWeight: 'bold' }}>{vasMaximized ? 'Minimize' : 'Maximize'}</button><span>WORKSHOP REVENUE ANALYSIS</span></span>
             
             {/* View selectors */}
             <div style={{ display: 'flex', gap: '8px' }}>
