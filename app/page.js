@@ -1453,13 +1453,14 @@ export default function Home() {
                         y={trendKpis.fullMonthTarget / 30} 
                         stroke="#ef4444" 
                         strokeDasharray="4 4" 
+                        strokeWidth={2}
                       />
                     )}
-                    <Line type="linear" name="This Year" dataKey="cy" stroke="#1e3a8a" strokeWidth={2.5} dot={{ r: 4, strokeWidth: 2, fill: 'var(--card)' }} activeDot={{ r: 6 }}>
-                      <LabelList dataKey="cy" position="top" style={{ fill: '#1e3a8a', fontSize: 10, fontWeight: 700 }} formatter={(val) => val > 0 ? (currentTrendMode === 'load' ? Math.round(val) : '') : ''} />
+                    <Line type="linear" name="This Year" dataKey="cy" stroke="#1e3a8a" strokeWidth={3.5} dot={{ r: 5, strokeWidth: 2.5, fill: 'var(--card)' }} activeDot={{ r: 7 }}>
+                      <LabelList dataKey="cy" position="top" style={{ fill: '#1e3a8a', fontSize: 11, fontWeight: 700 }} formatter={(val) => val > 0 ? (currentTrendMode === 'load' ? Math.round(val) : '') : ''} />
                     </Line>
-                    <Line type="linear" name="Last Year" dataKey="ly" stroke="#22c55e" strokeWidth={2} dot={{ r: 3, strokeWidth: 2, fill: 'var(--card)' }} activeDot={{ r: 5 }}>
-                      <LabelList dataKey="ly" position="bottom" style={{ fill: '#22c55e', fontSize: 10, fontWeight: 600 }} formatter={(val) => val > 0 ? (currentTrendMode === 'load' ? Math.round(val) : '') : ''} />
+                    <Line type="linear" name="Last Year" dataKey="ly" stroke="#22c55e" strokeWidth={3} dot={{ r: 4, strokeWidth: 2, fill: 'var(--card)' }} activeDot={{ r: 6 }}>
+                      <LabelList dataKey="ly" position="bottom" style={{ fill: '#22c55e', fontSize: 11, fontWeight: 600 }} formatter={(val) => val > 0 ? (currentTrendMode === 'load' ? Math.round(val) : '') : ''} />
                     </Line>
                   </LineChart>
                 </ResponsiveContainer>
