@@ -63,6 +63,8 @@ export async function GET(request) {
                 COALESCE(SUM(alert_rework), 0) as total_rework,
                 COALESCE(SUM(alert_discount), 0) as total_discount_alerts,
                 COALESCE(SUM(alert_leak), 0) as total_leak_alerts,
+                COALESCE(SUM(alert_low_lab_global), 0) as total_low_lab_global,
+                COALESCE(SUM(alert_low_part_global), 0) as total_low_part_global,
                 COALESCE(SUM(CASE WHEN alert_rework = 1 OR alert_discount = 1 OR alert_leak = 1 OR alert_low_lab = 1 OR alert_low_part = 1 OR alert_low_lab_global = 1 OR alert_low_part_global = 1 THEN 1 ELSE 0 END), 0) as total_flagged
             FROM Scored
             WHERE invoice_date >= SAFE_CAST(@startDate AS DATE)

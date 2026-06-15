@@ -919,10 +919,20 @@ export default function Home() {
                          alerts.includes(perfFilterAlert);
                          
       const matchSA = perfFilterSA === 'All' || r.advisor_name?.toUpperCase() === perfFilterSA.toUpperCase();
+      const matchType = perfFilterType === 'All' || r.service_type === perfFilterType;
+      const matchModel = perfFilterModel === 'All' || r.ppl === perfFilterModel;
 
-      return matchSearch && matchAlert && matchSA;
+      return matchSearch && matchAlert && matchSA && matchLoc && matchType && matchModel;
     });
-  }, [flaggedInvoices, perfSearchReg, perfFilterAlert, perfFilterSA]);
+  }, [flaggedInvoices, perfSearchReg, perfFilterAlert, perfFilterSA, perfFilterLoc, perfFilterType, perfFilterModel]);
+
+  const forensicsLocations = useMemo(() => {
+    return Array.from(new Set(flaggedInvoices.map(r => r.Location).filter(Boolean))).sort();
+  }, [flaggedInvoices]);
+
+  const forensicsModels = useMemo(() => {
+    return Array.from(new Set(flaggedInvoices.map(r => r.ppl).filter(Boolean))).sort();
+  }, [flaggedInvoices]);
 
   if (!mounted) return null;
 
@@ -2168,7 +2178,7 @@ export default function Home() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
               <h2 style={{ fontSize: '22px', letterSpacing: '-0.5px' }}>🔍 Performance Intelligence Report</h2>
               <span style={{ fontSize: '13px', opacity: 0.9, fontWeight: '400' }}>
-                Analysis window active: {startDate} to {endDate}
+                Analysis Window: This Month
               </span>
             </div>
             <button className="close-perf" onClick={() => setPerfModalOpen(false)}>Exit Studio</button>
@@ -2176,35 +2186,74 @@ export default function Home() {
 
           {/* Forensics Stats Row */}
           <div className="perf-stats">
-            <div className="perf-stat-card"><label>Total Checked</label><span>{formatNumber(forensicsSummary?.total_checked || 0)}</span></div>
-            <div className="perf-stat-card"><label>Filtered Alerts Registry</label><span>{formatNumber(filteredForensicsList.length)}</span></div>
-            <div className="perf-stat-card"><label>Alerts Found</label><span style={{ color: 'var(--danger)' }}>{formatNumber(forensicsSummary?.total_rework + forensicsSummary?.total_leak_alerts + forensicsSummary?.total_discount_alerts)}</span></div>
-            <div className="perf-stat-card" style={{ borderLeft: '4px solid var(--accent)' }}><label>Avg Advisor Score</label><span style={{ color: 'var(--accent)' }}>{forensicsSummary?.avg_global_score || 0}</span></div>
+            <div className="perf-stat-card"><label>TOTAL RECORDS</label><span>{formatNumber(forensicsSummary?.total_checked || 0)}</span></div>
+            <div className="perf-stat-card"><label>FILTERED TRANSACTIONS</label><span>{formatNumber(filteredForensicsList.length)}</span></div>
+            <div className="perf-stat-card"><label>ALERTS FOUND</label><span style={{ color: 'var(--danger)' }}>{formatNumber(forensicsSummary?.total_rework + forensicsSummary?.total_leak_alerts + forensicsSummary?.total_discount_alerts)}</span></div>
+            <div className="perf-stat-card" style={{ borderLeft: '4px solid var(--accent)' }}><label>AVG ADVISOR SCORE</label><span style={{ color: 'var(--accent)' }}>{forensicsSummary?.avg_global_score || 0}</span></div>
             
             <div className="perf-stat-card" style={{ background: 'var(--navy)', color: 'white', cursor: 'pointer' }} onClick={() => setScoringRulesOpen(true)}>
               <label style={{ color: 'rgba(255,255,255,0.9)', cursor: 'pointer', fontWeight: 700 }}>SCORING RULE</label>
               <span style={{ fontSize: '12px', fontWeight: 800, color: 'white' }}>📜 View Rules</span>
             </div>
             
+            <div className="perf-stat-card" style={{ background: '#22c55e', color: 'white', cursor: 'pointer', minWidth: '90px' }} onClick={() => alert('Excel Download Triggered')}>
+              <label style={{ color: 'rgba(255,255,255,0.9)', cursor: 'pointer', fontWeight: 800 }}>EXCEL</label>
+              <span style={{ fontSize: '12px', fontWeight: 800, color: 'white' }}>📊 Download</span>
+            </div>
+            
+            <div className="perf-stat-card" style={{ background: '#ef4444', color: 'white', cursor: 'pointer', minWidth: '90px' }} onClick={() => alert('PDF Download Triggered')}>
+              <label style={{ color: 'rgba(255,255,255,0.9)', cursor: 'pointer', fontWeight: 800 }}>PDF</label>
+              <span style={{ fontSize: '12px', fontWeight: 800, color: 'white' }}>📄 Download</span>
+            </div>
+
             <div className="perf-stat-card clickable-stat" style={{ background: '#f8fafc', minWidth: '105px' }} onClick={() => setPerfFilterAlert(prev => prev === 'Rework' ? 'All' : 'Rework')}>
-              <label style={{ fontSize: '9px', cursor: 'pointer' }}>30-Day Rework</label>
+              <label style={{ fontSize: '9px', cursor: 'pointer', textTransform: 'uppercase' }}>30-Day Rework</label>
               <span style={{ fontSize: '14px', color: '#ef4444' }}>{formatNumber(forensicsSummary?.total_rework || 0)}</span>
             </div>
             <div className="perf-stat-card clickable-stat" style={{ background: '#f8fafc', minWidth: '105px' }} onClick={() => setPerfFilterAlert(prev => prev === 'Discount' ? 'All' : 'Discount')}>
-              <label style={{ fontSize: '9px', cursor: 'pointer' }}>Manual Discount</label>
+              <label style={{ fontSize: '9px', cursor: 'pointer', textTransform: 'uppercase' }}>Manual Discount</label>
               <span style={{ fontSize: '14px', color: '#ef4444' }}>{formatNumber(forensicsSummary?.total_discount_alerts || 0)}</span>
             </div>
             <div className="perf-stat-card clickable-stat" style={{ background: '#f8fafc', minWidth: '105px' }} onClick={() => setPerfFilterAlert(prev => prev === 'Leak' ? 'All' : 'Leak')}>
-              <label style={{ fontSize: '9px', cursor: 'pointer' }}>Labour Leakage</label>
+              <label style={{ fontSize: '9px', cursor: 'pointer', textTransform: 'uppercase' }}>Labour Leakage</label>
               <span style={{ fontSize: '14px', color: '#ef4444' }}>{formatNumber(forensicsSummary?.total_leak_alerts || 0)}</span>
+            </div>
+          </div>
+          <div className="perf-stats" style={{ marginTop: '10px', justifyContent: 'flex-start' }}>
+            <div className="perf-stat-card clickable-stat" style={{ background: '#f8fafc', minWidth: '105px' }} onClick={() => setPerfFilterAlert(prev => prev === 'LowLabourGlobal' ? 'All' : 'LowLabourGlobal')}>
+              <label style={{ fontSize: '9px', cursor: 'pointer', textTransform: 'uppercase' }}>Low Lab (W)</label>
+              <span style={{ fontSize: '14px', color: '#ef4444' }}>{formatNumber(forensicsSummary?.total_low_lab_global || 0)}</span>
+            </div>
+            <div className="perf-stat-card clickable-stat" style={{ background: '#f8fafc', minWidth: '105px' }} onClick={() => setPerfFilterAlert(prev => prev === 'LowPartGlobal' ? 'All' : 'LowPartGlobal')}>
+              <label style={{ fontSize: '9px', cursor: 'pointer', textTransform: 'uppercase' }}>Low Part (W)</label>
+              <span style={{ fontSize: '14px', color: '#ef4444' }}>{formatNumber(forensicsSummary?.total_low_part_global || 0)}</span>
             </div>
           </div>
 
           {/* Forensics Filters Toolbar */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '15px', marginBottom: '20px', background: 'var(--card)', padding: '20px', borderRadius: '12px', border: '1px solid var(--border)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '15px', marginBottom: '20px', background: 'var(--card)', padding: '20px', borderRadius: '12px', border: '1px solid var(--border)' }}>
             <div>
               <label style={{ display: 'block', fontSize: '10px', fontWeight: 800, color: 'var(--subtext)', marginBottom: '8px' }}>SEARCH REG</label>
-              <input type="text" style={{ width: '100%', padding: '10px', border: '1px solid var(--border)', borderRadius: '8px', fontSize: '12px', background: 'var(--bg)', color: 'var(--text)', outline: 'none' }} placeholder="Search Reg..." value={perfSearchReg} onChange={(e) => setPerfSearchReg(e.target.value)} />
+              <input type="text" style={{ width: '100%', padding: '10px', border: '1px solid var(--border)', borderRadius: '8px', fontSize: '12px', background: 'var(--bg)', color: 'var(--text)', outline: 'none' }} placeholder="Search Registration..." value={perfSearchReg} onChange={(e) => setPerfSearchReg(e.target.value)} />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '10px', fontWeight: 800, color: 'var(--subtext)', marginBottom: '8px' }}>BRANCH</label>
+              <select style={{ width: '100%', padding: '10px', border: '1px solid var(--border)', borderRadius: '8px', fontSize: '12px', background: 'var(--bg)', color: 'var(--text)', outline: 'none' }} value={perfFilterLoc} onChange={(e) => setPerfFilterLoc(e.target.value)}>
+                <option value="All">All Locations</option>
+                {forensicsLocations.map(loc => (
+                  <option key={loc} value={loc}>{loc}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '10px', fontWeight: 800, color: 'var(--subtext)', marginBottom: '8px' }}>SERVICE TYPE</label>
+              <select style={{ width: '100%', padding: '10px', border: '1px solid var(--border)', borderRadius: '8px', fontSize: '12px', background: 'var(--bg)', color: 'var(--text)', outline: 'none' }} value={perfFilterType} onChange={(e) => setPerfFilterType(e.target.value)}>
+                <option value="All">All Types</option>
+                <option value="Paid Service">Paid Service</option>
+                <option value="Free Services">Free Services</option>
+                <option value="Running Repairs">Running Repairs</option>
+                <option value="Accident">Accident</option>
+              </select>
             </div>
             <div>
               <label style={{ display: 'block', fontSize: '10px', fontWeight: 800, color: 'var(--subtext)', marginBottom: '8px' }}>ADVISOR</label>
@@ -2229,12 +2278,21 @@ export default function Home() {
                 <option value="LowRevenue">Any Low Revenue</option>
               </select>
             </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '10px', fontWeight: 800, color: 'var(--subtext)', marginBottom: '8px' }}>MODEL</label>
+              <select style={{ width: '100%', padding: '10px', border: '1px solid var(--border)', borderRadius: '8px', fontSize: '12px', background: 'var(--bg)', color: 'var(--text)', outline: 'none' }} value={perfFilterModel} onChange={(e) => setPerfFilterModel(e.target.value)}>
+                <option value="All">All Models</option>
+                {forensicsModels.map(m => (
+                  <option key={m} value={m}>{m}</option>
+                ))}
+              </select>
+            </div>
             <div style={{ display: 'flex', alignItems: 'flex-end' }}>
               <button 
-                onClick={() => { setPerfSearchReg(''); setPerfFilterLoc('All'); setPerfFilterAlert('All'); setPerfFilterSA('All'); }}
+                onClick={() => { setPerfSearchReg(''); setPerfFilterLoc('All'); setPerfFilterType('All'); setPerfFilterAlert('All'); setPerfFilterSA('All'); setPerfFilterModel('All'); }}
                 style={{ width: '100%', padding: '10px', borderRadius: '8px', background: 'var(--table-head)', border: '1px solid var(--border)', fontWeight: 700, cursor: 'pointer' }}
               >
-                Reset Filters
+                Reset All
               </button>
             </div>
           </div>
@@ -2246,6 +2304,7 @@ export default function Home() {
                 <thead>
                   <tr>
                     <th>Sr</th>
+                    <th>Branch</th>
                     <th>Type</th>
                     <th>Date</th>
                     <th>Bill No</th>
@@ -2255,8 +2314,9 @@ export default function Home() {
                     <th>Labour Amt</th>
                     <th>Part Amt</th>
                     <th>Discount</th>
-                    <th>Alerts Triggered</th>
-                    <th>Quality Score</th>
+                    <th>VAS/WA/WB</th>
+                    <th>Alerts</th>
+                    <th>Score</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -2266,6 +2326,7 @@ export default function Home() {
                     return (
                       <tr key={r.invoice_number}>
                         <td>{i + 1}</td>
+                        <td>{r.Location || '-'}</td>
                         <td>{r.service_type || '-'}</td>
                         <td style={{ fontFamily: 'monospace' }}>{dateStr}</td>
                         <td style={{ fontWeight: '600', color: 'var(--primary)' }}>{r.invoice_number}</td>
@@ -2275,6 +2336,7 @@ export default function Home() {
                         <td>{formatCurrency(r.labour_amount)}</td>
                         <td>{formatCurrency(r.spare_sale)}</td>
                         <td style={{ color: 'var(--danger)' }}>{formatCurrency(r.discount)}</td>
+                        <td>-</td>
                         <td>
                           <div style={{ display: 'flex', justifyContent: 'center', gap: '4px', flexWrap: 'wrap' }}>
                             {r.alert_rework === 1 && <span className="forensics-alert-tag rework">Rework</span>}
