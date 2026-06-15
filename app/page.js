@@ -934,6 +934,51 @@ export default function Home() {
     return Array.from(new Set(flaggedInvoices.map(r => r.ppl).filter(Boolean))).sort();
   }, [flaggedInvoices]);
 
+  const handleDownloadCSV = () => {
+    const headers = ['Sr', 'Branch', 'Type', 'Date', 'Bill No', 'Model', 'Reg Number', 'Advisor', 'Labour Amt', 'Part Amt', 'Discount', 'VAS/WA/WB', 'Alerts', 'Score'];
+    const rows = filteredForensicsList.map((r, i) => {
+      const dateStr = r.invoice_date?.value || r.invoice_date || '-';
+      const alerts = [];
+      if (r.alert_discount === 1) alerts.push('Manual Discount Applied');
+      if (r.alert_rework === 1) alerts.push('30-Day Rework');
+      if (r.alert_leak === 1) alerts.push('Labour Leakage');
+      if (r.alert_low_lab === 1) alerts.push('Labour below Model Avg');
+      if (r.alert_low_part === 1) alerts.push('Parts below Model Avg');
+      if (r.alert_low_lab_global === 1) alerts.push('Labour below Workshop Avg');
+      if (r.alert_low_part_global === 1) alerts.push('Parts below Workshop Avg');
+      
+      return [
+        i + 1,
+        r.Location || '-',
+        r.service_type || '-',
+        dateStr,
+        r.invoice_number,
+        r.ppl || '-',
+        r.reg_no,
+        r.advisor_name,
+        r.labour_amount || 0,
+        r.spare_sale || 0,
+        r.discount || 0,
+        '-',
+        alerts.join(' | '),
+        r.advisor_score || 0
+      ].map(v => `"${v}"`).join(',');
+    });
+    
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "performance_report.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleDownloadPDF = () => {
+    window.print();
+  };
+
   if (!mounted) return null;
 
   return (
@@ -2196,12 +2241,12 @@ export default function Home() {
               <span style={{ fontSize: '12px', fontWeight: 800, color: 'white' }}>📜 View Rules</span>
             </div>
             
-            <div className="perf-stat-card" style={{ background: '#22c55e', color: 'white', cursor: 'pointer', minWidth: '90px' }} onClick={() => alert('Excel Download Triggered')}>
+            <div className="perf-stat-card" style={{ background: '#22c55e', color: 'white', cursor: 'pointer', minWidth: '90px' }} onClick={handleDownloadCSV}>
               <label style={{ color: 'rgba(255,255,255,0.9)', cursor: 'pointer', fontWeight: 800 }}>EXCEL</label>
               <span style={{ fontSize: '12px', fontWeight: 800, color: 'white' }}>📊 Download</span>
             </div>
             
-            <div className="perf-stat-card" style={{ background: '#ef4444', color: 'white', cursor: 'pointer', minWidth: '90px' }} onClick={() => alert('PDF Download Triggered')}>
+            <div className="perf-stat-card" style={{ background: '#ef4444', color: 'white', cursor: 'pointer', minWidth: '90px' }} onClick={handleDownloadPDF}>
               <label style={{ color: 'rgba(255,255,255,0.9)', cursor: 'pointer', fontWeight: 800 }}>PDF</label>
               <span style={{ fontSize: '12px', fontWeight: 800, color: 'white' }}>📄 Download</span>
             </div>
@@ -2361,7 +2406,7 @@ export default function Home() {
 
       {/* Forensic Scoring Rules Modal */}
       {scoringRulesOpen && (
-        <div className="scoring-rule-modal" style={{ display: 'flex' }} onClick={() => setScoringRulesOpen(false)}>
+        <div className="scoring-rule-modal" style={{ display: 'flex', position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(15, 23, 42, 0.7)', zIndex: 10000, justifyContent: 'center', alignItems: 'center' }} onClick={() => setScoringRulesOpen(false)}>
           <div className="scoring-rule-content" onClick={(e) => e.stopPropagation()} style={{ background: '#ffffff', color: '#1e293b', padding: '30px', borderRadius: '12px', width: '90%', maxWidth: '800px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
               <h2 style={{ color: 'var(--navy)', fontSize: '22px', margin: 0 }}>Forensic Audit Scoring Rules</h2>
