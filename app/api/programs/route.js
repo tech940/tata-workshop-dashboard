@@ -81,6 +81,16 @@ export async function GET(request) {
             ORDER BY total_contracts DESC
         `;
 
+        const ewSummaryByLocationQuery = `
+            SELECT 
+                Division as division,
+                COUNT(1) as total_contracts
+            FROM \`${projectDataset}.extended_warranty\`
+            WHERE Sale_Date >= SAFE_CAST(@startDate AS DATE)
+              AND Sale_Date <= SAFE_CAST(@endDate AS DATE)
+            GROUP BY division
+        `;
+
         const ewRecentQuery = `
             SELECT 
                 Sale_Date as sale_date,
@@ -108,6 +118,7 @@ export async function GET(request) {
             [amcSummary],
             [amcRecent],
             [ewSummary],
+            [ewSummaryByLocation],
             [ewRecent]
         ] = await Promise.all([
             bigquery.query({ query: membershipSummaryQuery, ...options }),
@@ -115,6 +126,7 @@ export async function GET(request) {
             bigquery.query({ query: amcSummaryQuery, ...options }),
             bigquery.query({ query: amcRecentQuery, ...options }),
             bigquery.query({ query: ewSummaryQuery, ...options }),
+            bigquery.query({ query: ewSummaryByLocationQuery, ...options }),
             bigquery.query({ query: ewRecentQuery, ...options })
         ]);
 
@@ -129,6 +141,7 @@ export async function GET(request) {
             },
             ew: {
                 summary: ewSummary,
+                summaryByLocation: ewSummaryByLocation.map(e => ({ ...e, division: getMappedLocation(e.division) })),
                 recent: ewRecent.map(e => ({ ...e, division: getMappedLocation(e.division) }))
             }
         });
