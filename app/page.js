@@ -935,7 +935,7 @@ export default function Home() {
   }, [flaggedInvoices]);
 
   const handleDownloadCSV = () => {
-    const headers = ['Sr', 'Branch', 'Type', 'Date', 'Bill No', 'Model', 'Reg Number', 'Advisor', 'Labour Amt', 'Part Amt', 'Discount', 'VAS/WA/WB', 'Alerts', 'Score'];
+    const headers = ['Sr', 'Branch', 'Type', 'Date', 'Bill No', 'Model', 'Reg Number', 'Advisor', 'Labour Amt', 'Part Amt', 'Discount', 'Discount %', 'Alerts', 'Score'];
     const rows = filteredForensicsList.map((r, i) => {
       const dateStr = r.invoice_date?.value || r.invoice_date || '-';
       const alerts = [];
@@ -946,6 +946,9 @@ export default function Home() {
       if (r.alert_low_part === 1) alerts.push('Parts below Model Avg');
       if (r.alert_low_lab_global === 1) alerts.push('Labour below Workshop Avg');
       if (r.alert_low_part_global === 1) alerts.push('Parts below Workshop Avg');
+      
+      const totalVal = (r.labour_amount || 0) + (r.spare_sale || 0) + (r.discount || 0);
+      const discountPct = totalVal > 0 ? ((r.discount || 0) / totalVal * 100).toFixed(1) + '%' : '0%';
       
       return [
         i + 1,
@@ -959,7 +962,7 @@ export default function Home() {
         r.labour_amount || 0,
         r.spare_sale || 0,
         r.discount || 0,
-        '-',
+        discountPct,
         alerts.join(' | '),
         r.advisor_score || 0
       ].map(v => `"${v}"`).join(',');
@@ -2359,7 +2362,7 @@ export default function Home() {
                     <th>Labour Amt</th>
                     <th>Part Amt</th>
                     <th>Discount</th>
-                    <th>VAS/WA/WB</th>
+                    <th>Discount %</th>
                     <th>Alerts</th>
                     <th>Score</th>
                   </tr>
@@ -2368,6 +2371,8 @@ export default function Home() {
                   {filteredForensicsList.map((r, i) => {
                     const dateStr = r.invoice_date?.value || r.invoice_date || '-';
                     const scoreColor = r.advisor_score >= 85 ? 'var(--success)' : r.advisor_score >= 70 ? 'var(--accent)' : 'var(--danger)';
+                    const totalVal = (r.labour_amount || 0) + (r.spare_sale || 0) + (r.discount || 0);
+                    const discountPct = totalVal > 0 ? ((r.discount || 0) / totalVal * 100).toFixed(1) + '%' : '0%';
                     return (
                       <tr key={r.invoice_number}>
                         <td>{i + 1}</td>
@@ -2381,7 +2386,7 @@ export default function Home() {
                         <td>{formatCurrency(r.labour_amount)}</td>
                         <td>{formatCurrency(r.spare_sale)}</td>
                         <td style={{ color: 'var(--danger)' }}>{formatCurrency(r.discount)}</td>
-                        <td>-</td>
+                        <td style={{ fontWeight: '600', color: 'var(--danger)' }}>{discountPct}</td>
                         <td>
                           <div style={{ color: '#ef4444', fontSize: '10px', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '2px', fontWeight: '500' }}>
                             {r.alert_discount === 1 && <span>Manual Discount Applied</span>}
