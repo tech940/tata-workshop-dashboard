@@ -1092,6 +1092,7 @@ export default function Home() {
         .fullscreen .table-container td span { font-size: 15px !important; }
         .fullscreen .group-row td { font-size: 16px !important; padding: 18px !important; }
         .fullscreen .child-row td { font-size: 14px !important; padding: 14px 16px !important; }
+        .fullscreen .table-container { max-height: calc(100vh - 150px) !important; overflow-y: auto !important; }
       `}} />
       
       {/* Loading overlay spinner */}
