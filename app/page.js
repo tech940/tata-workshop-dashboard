@@ -1441,7 +1441,22 @@ export default function Home() {
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={processedDayTrends} margin={{ top: 25, right: 10, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                    <XAxis dataKey="day" stroke="var(--subtext)" fontSize={10} tickLine={false} />
+                    <XAxis 
+                      dataKey="day" 
+                      stroke="var(--subtext)" 
+                      tickLine={false} 
+                      tick={(props) => {
+                        const { x, y, payload } = props;
+                        const idx = parseInt(payload.value, 10) - 1;
+                        const dayName = processedDayTrends[idx]?.dayName || '';
+                        return (
+                          <g transform={`translate(${x},${y})`}>
+                            <text x={0} y={0} dy={12} textAnchor="middle" fill="var(--text)" fontSize={11} fontWeight={600}>{payload.value}</text>
+                            <text x={0} y={0} dy={26} textAnchor="middle" fill="var(--subtext)" fontSize={10} fontWeight={500}>{dayName}</text>
+                          </g>
+                        );
+                      }} 
+                    />
                     <YAxis stroke="var(--subtext)" fontSize={10} tickLine={false} />
                     <Tooltip 
                       contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--text)' }} 
