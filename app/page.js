@@ -99,7 +99,7 @@ export default function Home() {
 
   
   const aggregatedOpenRo = useMemo(() => {
-    if (!opsOpenRos || opsOpenRos.length === 0) return { byType: {}, byReason: [], totalRow: null, reasonTotalRow: null };
+    if (!Array.isArray(opsOpenRos) || opsOpenRos.length === 0) return { byType: {}, byReason: [], totalRow: null, reasonTotalRow: null };
 
     const byType = {};
     const byReason = {};
@@ -108,6 +108,7 @@ export default function Home() {
     let rTotal = { mech: 0, acc: 0, d0_4: 0, d5_7: 0, d8_15: 0, d15_plus: 0, totalDays: 0 };
 
     opsOpenRos.forEach(ro => {
+      if (!ro) return;
       // Clean and normalize
       let rawType = ro.service_type || 'Others';
       let typeStr = String(rawType).toLowerCase();
@@ -1587,10 +1588,6 @@ export default function Home() {
           </div> {/* End grid-top */}
 
           {/* Workshop Performance Section (Day Wise Trend Chart) */}
-          <div style={{ background: 'var(--navy)', color: 'var(--navy-text)', padding: '10px 20px', borderRadius: '8px', margin: '15px 0', fontWeight: 600, fontSize: '14px', letterSpacing: '0.5px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
-            Workshop Performance
-          </div>
-
           <div className={`card ${maximizedCard === 'cardDayTrend' ? 'fullscreen' : ''}`} id="cardDayTrend" style={{ marginBottom: '15px' }}>
             <div className="card-header">
               <span>Day Wise Trend (Current vs Last Year)</span>
