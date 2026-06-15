@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { 
   ResponsiveContainer, 
   XAxis, 
@@ -1608,7 +1608,7 @@ export default function Home() {
             {/* Recharts responsive Area chart */}
             <div className="chart-container" style={{ height: '350px', padding: '20px' }}>
               {processedDayTrends.length > 0 && (
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={1} minHeight={1}>
                   <LineChart data={processedDayTrends} margin={{ top: 25, right: 10, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
                     <XAxis 
