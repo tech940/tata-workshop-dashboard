@@ -2037,7 +2037,7 @@ export default function Home() {
                     {opsOpenRos.map(ro => (
                       <tr key={ro.jc_number}>
                         <td style={{ fontWeight: '700', color: 'var(--navy)' }}>{ro.jc_number}</td>
-                        <td>{ro.created_date}</td>
+                        <td>{formatDateDisplay(ro.created_date?.value || ro.created_date)}</td>
                         <td>{ro.model}</td>
                         <td>{ro.reg_no}</td>
                         <td>{ro.division}</td>
@@ -2076,7 +2076,7 @@ export default function Home() {
                   <tbody>
                     {opsMemberships.map((m, idx) => (
                       <tr key={idx}>
-                        <td>{m.start_date?.value || m.start_date || '-'}</td>
+                        <td>{formatDateDisplay(m.start_date?.value || m.start_date) || '-'}</td>
                         <td style={{ fontWeight: '600' }}>{m.program_name}</td>
                         <td>{m.dealer}</td>
                         <td>
@@ -2111,7 +2111,7 @@ export default function Home() {
                   <tbody>
                     {opsAmc.map((amc, idx) => (
                       <tr key={idx}>
-                        <td>{amc.start_date || '-'}</td>
+                        <td>{formatDateDisplay(amc.start_date?.value || amc.start_date)}</td>
                         <td style={{ fontWeight: '600' }}>{amc.contract_no}</td>
                         <td>{amc.model}</td>
                         <td>{amc.division}</td>
@@ -2144,7 +2144,7 @@ export default function Home() {
                   <tbody>
                     {opsEw.map((ew, idx) => (
                       <tr key={idx}>
-                        <td>{ew.sale_date || '-'}</td>
+                        <td>{formatDateDisplay(ew.sale_date?.value || ew.sale_date)}</td>
                         <td style={{ fontWeight: '600' }}>{ew.product_name}</td>
                         <td>{ew.division}</td>
                         <td style={{ fontWeight: '700', color: 'var(--accent)' }}>{formatCurrency(ew.price)}</td>
