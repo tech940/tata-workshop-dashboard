@@ -2338,13 +2338,14 @@ export default function Home() {
                         <td style={{ color: 'var(--danger)' }}>{formatCurrency(r.discount)}</td>
                         <td>-</td>
                         <td>
-                          <div style={{ display: 'flex', justifyContent: 'center', gap: '4px', flexWrap: 'wrap' }}>
-                            {r.alert_rework === 1 && <span className="forensics-alert-tag rework">Rework</span>}
-                            {r.alert_leak === 1 && <span className="forensics-alert-tag leak">Leakage</span>}
-                            {r.alert_discount === 1 && <span className="forensics-alert-tag discount">Discount</span>}
-                            {(r.alert_low_lab === 1 || r.alert_low_part === 1 || r.alert_low_lab_global === 1 || r.alert_low_part_global === 1) && (
-                              <span className="forensics-alert-tag low-price">Low Pricing</span>
-                            )}
+                          <div style={{ color: '#ef4444', fontSize: '10px', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '2px', fontWeight: '500' }}>
+                            {r.alert_discount === 1 && <span>Manual Discount Applied</span>}
+                            {r.alert_rework === 1 && <span>30-Day Rework (Prev: {formatDateDisplay(r.prev_date?.value || r.prev_date)} | Curr: {formatDateDisplay(r.invoice_date?.value || r.invoice_date)})</span>}
+                            {r.alert_leak === 1 && <span>Labour Leakage</span>}
+                            {r.alert_low_lab === 1 && <span>Labour below Model Avg</span>}
+                            {r.alert_low_part === 1 && <span>Parts below Model Avg</span>}
+                            {r.alert_low_lab_global === 1 && <span>Labour below Workshop Avg</span>}
+                            {r.alert_low_part_global === 1 && <span>Parts below Workshop Avg</span>}
                           </div>
                         </td>
                         <td style={{ fontWeight: '800', color: scoreColor }}>{r.advisor_score}</td>

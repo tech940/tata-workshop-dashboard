@@ -96,9 +96,12 @@ export async function GET(request) {
             SELECT 
                 invoice_number,
                 invoice_date,
+                prev_date,
                 reg_no,
                 chassis_no,
                 Location,
+                \`Service Type\` as service_type,
+                PPL as ppl,
                 COALESCE(advisor, 'UNASSIGNED') as advisor_name,
                 labour_amount,
                 spare_sale,
