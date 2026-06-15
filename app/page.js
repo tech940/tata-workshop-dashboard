@@ -1505,33 +1505,41 @@ export default function Home() {
             {/* Labour Revenue Card */}
             <div className="card rev-card">
               <div className="card-header" style={{ padding: '8px 10px', borderBottom: '1px solid var(--border)' }}>Labour Revenue</div>
-              <table style={{ margin: '5px 0' }}>
+              <table className="horizontal-table" style={{ margin: '5px 0', width: '100%', fontSize: '10px' }}>
                 <thead>
                   <tr>
-                    <th>Revenue</th>
-                    <th>CY</th>
-                    <th>LY</th>
-                    <th>%</th>
+                    <th rowSpan="2" style={{ verticalAlign: 'middle', borderBottom: '1px solid var(--border)' }}>Revenue</th>
+                    <th colSpan="3" style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>MTD</th>
+                    <th colSpan="3" style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>QTD</th>
+                    <th colSpan="3" style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>YTD</th>
+                  </tr>
+                  <tr>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>CY</th>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>LY</th>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>%</th>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>CY</th>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>LY</th>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>%</th>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>CY</th>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>LY</th>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>%</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td style={{ fontWeight: '600' }}>MTD</td>
-                    <td>{formatCurrency(aggregatedData.total.lab_cy)}</td>
-                    <td>{formatCurrency(aggregatedData.total.lab_ly)}</td>
-                    <td><span className={getGrowthClass(calcGrowth(aggregatedData.total.lab_cy, aggregatedData.total.lab_ly))}>{calcGrowth(aggregatedData.total.lab_cy, aggregatedData.total.lab_ly)}</span></td>
-                  </tr>
-                  <tr>
-                    <td style={{ fontWeight: '600' }}>QTD</td>
-                    <td>{formatCurrency(aggregatedData.total.lab_qcy)}</td>
-                    <td>{formatCurrency(aggregatedData.total.lab_qly)}</td>
-                    <td><span className={getGrowthClass(calcGrowth(aggregatedData.total.lab_qcy, aggregatedData.total.lab_qly))}>{calcGrowth(aggregatedData.total.lab_qcy, aggregatedData.total.lab_qly)}</span></td>
-                  </tr>
-                  <tr>
-                    <td style={{ fontWeight: '600' }}>YTD</td>
-                    <td>{formatCurrency(aggregatedData.total.lab_ycy)}</td>
-                    <td>{formatCurrency(aggregatedData.total.lab_yly)}</td>
-                    <td><span className={getGrowthClass(calcGrowth(aggregatedData.total.lab_ycy, aggregatedData.total.lab_yly))}>{calcGrowth(aggregatedData.total.lab_ycy, aggregatedData.total.lab_yly)}</span></td>
+                    <td style={{ fontWeight: '700' }}>Total</td>
+                    
+                    <td style={{ textAlign: 'center' }}>{formatCurrency(aggregatedData.total.lab_cy)}</td>
+                    <td style={{ textAlign: 'center' }}>{formatCurrency(aggregatedData.total.lab_ly)}</td>
+                    <td style={{ textAlign: 'center' }}><span className={getGrowthClass(calcGrowth(aggregatedData.total.lab_cy, aggregatedData.total.lab_ly))}>{calcGrowth(aggregatedData.total.lab_cy, aggregatedData.total.lab_ly)}</span></td>
+                    
+                    <td style={{ textAlign: 'center' }}>{formatCurrency(aggregatedData.total.lab_qcy)}</td>
+                    <td style={{ textAlign: 'center' }}>{formatCurrency(aggregatedData.total.lab_qly)}</td>
+                    <td style={{ textAlign: 'center' }}><span className={getGrowthClass(calcGrowth(aggregatedData.total.lab_qcy, aggregatedData.total.lab_qly))}>{calcGrowth(aggregatedData.total.lab_qcy, aggregatedData.total.lab_qly)}</span></td>
+                    
+                    <td style={{ textAlign: 'center' }}>{formatCurrency(aggregatedData.total.lab_ycy)}</td>
+                    <td style={{ textAlign: 'center' }}>{formatCurrency(aggregatedData.total.lab_yly)}</td>
+                    <td style={{ textAlign: 'center' }}><span className={getGrowthClass(calcGrowth(aggregatedData.total.lab_ycy, aggregatedData.total.lab_yly))}>{calcGrowth(aggregatedData.total.lab_ycy, aggregatedData.total.lab_yly)}</span></td>
                   </tr>
                 </tbody>
               </table>
@@ -1540,33 +1548,41 @@ export default function Home() {
             {/* Part Revenue Card */}
             <div className="card rev-card">
               <div className="card-header" style={{ padding: '8px 10px', borderBottom: '1px solid var(--border)' }}>Part Revenue</div>
-              <table style={{ margin: '5px 0' }}>
+              <table className="horizontal-table" style={{ margin: '5px 0', width: '100%', fontSize: '10px' }}>
                 <thead>
                   <tr>
-                    <th>Revenue</th>
-                    <th>CY</th>
-                    <th>LY</th>
-                    <th>%</th>
+                    <th rowSpan="2" style={{ verticalAlign: 'middle', borderBottom: '1px solid var(--border)' }}>Revenue</th>
+                    <th colSpan="3" style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>MTD</th>
+                    <th colSpan="3" style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>QTD</th>
+                    <th colSpan="3" style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>YTD</th>
+                  </tr>
+                  <tr>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>CY</th>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>LY</th>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>%</th>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>CY</th>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>LY</th>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>%</th>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>CY</th>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>LY</th>
+                    <th style={{ textAlign: 'center', borderBottom: '1px solid var(--border)' }}>%</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td style={{ fontWeight: '600' }}>MTD</td>
-                    <td>{formatCurrency(aggregatedData.total.part_cy)}</td>
-                    <td>{formatCurrency(aggregatedData.total.part_ly)}</td>
-                    <td><span className={getGrowthClass(calcGrowth(aggregatedData.total.part_cy, aggregatedData.total.part_ly))}>{calcGrowth(aggregatedData.total.part_cy, aggregatedData.total.part_ly)}</span></td>
-                  </tr>
-                  <tr>
-                    <td style={{ fontWeight: '600' }}>QTD</td>
-                    <td>{formatCurrency(aggregatedData.total.part_qcy)}</td>
-                    <td>{formatCurrency(aggregatedData.total.part_qly)}</td>
-                    <td><span className={getGrowthClass(calcGrowth(aggregatedData.total.part_qcy, aggregatedData.total.part_qly))}>{calcGrowth(aggregatedData.total.part_qcy, aggregatedData.total.part_qly)}</span></td>
-                  </tr>
-                  <tr>
-                    <td style={{ fontWeight: '600' }}>YTD</td>
-                    <td>{formatCurrency(aggregatedData.total.part_ycy)}</td>
-                    <td>{formatCurrency(aggregatedData.total.part_yly)}</td>
-                    <td><span className={getGrowthClass(calcGrowth(aggregatedData.total.part_ycy, aggregatedData.total.part_yly))}>{calcGrowth(aggregatedData.total.part_ycy, aggregatedData.total.part_yly)}</span></td>
+                    <td style={{ fontWeight: '700' }}>Total</td>
+                    
+                    <td style={{ textAlign: 'center' }}>{formatCurrency(aggregatedData.total.part_cy)}</td>
+                    <td style={{ textAlign: 'center' }}>{formatCurrency(aggregatedData.total.part_ly)}</td>
+                    <td style={{ textAlign: 'center' }}><span className={getGrowthClass(calcGrowth(aggregatedData.total.part_cy, aggregatedData.total.part_ly))}>{calcGrowth(aggregatedData.total.part_cy, aggregatedData.total.part_ly)}</span></td>
+                    
+                    <td style={{ textAlign: 'center' }}>{formatCurrency(aggregatedData.total.part_qcy)}</td>
+                    <td style={{ textAlign: 'center' }}>{formatCurrency(aggregatedData.total.part_qly)}</td>
+                    <td style={{ textAlign: 'center' }}><span className={getGrowthClass(calcGrowth(aggregatedData.total.part_qcy, aggregatedData.total.part_qly))}>{calcGrowth(aggregatedData.total.part_qcy, aggregatedData.total.part_qly)}</span></td>
+                    
+                    <td style={{ textAlign: 'center' }}>{formatCurrency(aggregatedData.total.part_ycy)}</td>
+                    <td style={{ textAlign: 'center' }}>{formatCurrency(aggregatedData.total.part_yly)}</td>
+                    <td style={{ textAlign: 'center' }}><span className={getGrowthClass(calcGrowth(aggregatedData.total.part_ycy, aggregatedData.total.part_yly))}>{calcGrowth(aggregatedData.total.part_ycy, aggregatedData.total.part_yly)}</span></td>
                   </tr>
                 </tbody>
               </table>
