@@ -73,6 +73,7 @@ export default function Home() {
   const [vasOpenRoExpandedGroups, setVasOpenRoExpandedGroups] = useState({ 'Accident': true, 'Running Repairs': false, 'Paid Service': false, 'Free Services': false, 'Others': false });
   const [vasExpandedGroups, setVasExpandedGroups] = useState({ 'Paid Services': true, 'Free Services': false, 'Running Repairs': false, 'Accidental': false, 'Others': false });
   const [vasMaximized, setVasMaximized] = useState(false);
+  const [selectedVehicleDetails, setSelectedVehicleDetails] = useState(null);
 
   // Workshop Operations (section-ops) state
   const [opsOpenRos, setOpsOpenRos] = useState([]);
@@ -1922,7 +1923,7 @@ export default function Home() {
                             {expanded && row.items.map(it => {
                                const textStr = `${it.delay_reason} Receiving Date : ${it.created_date?.value || it.created_date || '-'} PTD : - Claim date : - ${it.action_taken ? 'Action: '+it.action_taken : ''}`;
                                return (
-                                  <tr key={it.jc_number} className="child-row">
+                                  <tr key={it.jc_number} className="child-row" style={{ cursor: 'pointer' }} onClick={() => setSelectedVehicleDetails(it)}>
                                     <td style={{ textAlign: 'right', paddingRight: '20px', color: '#3b82f6', fontSize: '11px' }}>
                                       {it.reg_no} ({it.model})
                                     </td>
