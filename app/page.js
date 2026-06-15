@@ -934,6 +934,10 @@ export default function Home() {
     return Array.from(new Set(flaggedInvoices.map(r => r.ppl).filter(Boolean))).sort();
   }, [flaggedInvoices]);
 
+  const forensicsServiceTypes = useMemo(() => {
+    return Array.from(new Set(flaggedInvoices.map(r => r.service_type).filter(Boolean))).sort();
+  }, [flaggedInvoices]);
+
   const handleDownloadCSV = () => {
     const headers = ['Sr', 'Branch', 'Type', 'Date', 'Bill No', 'Model', 'Reg Number', 'Advisor', 'Labour Amt', 'Part Amt', 'Discount', 'Discount %', 'Alerts', 'Score'];
     const rows = filteredForensicsList.map((r, i) => {
@@ -2297,10 +2301,9 @@ export default function Home() {
               <label style={{ display: 'block', fontSize: '10px', fontWeight: 800, color: 'var(--subtext)', marginBottom: '8px' }}>SERVICE TYPE</label>
               <select style={{ width: '100%', padding: '10px', border: '1px solid var(--border)', borderRadius: '8px', fontSize: '12px', background: 'var(--bg)', color: 'var(--text)', outline: 'none' }} value={perfFilterType} onChange={(e) => setPerfFilterType(e.target.value)}>
                 <option value="All">All Types</option>
-                <option value="Paid Service">Paid Service</option>
-                <option value="Free Services">Free Services</option>
-                <option value="Running Repairs">Running Repairs</option>
-                <option value="Accident">Accident</option>
+                {forensicsServiceTypes.map(type => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
               </select>
             </div>
             <div>
