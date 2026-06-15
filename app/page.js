@@ -554,6 +554,26 @@ export default function Home() {
     return trendData;
   }, [masterData, selectedLoc, currentTrendServiceType, currentTrendMode]);
 
+  const processedFyTrends = useMemo(() => {
+    if (!masterData || !masterData.fyTrends) return null;
+    
+    const aggregated = {};
+    masterData.fyTrends.forEach(f => {
+      const locMatch = selectedLoc === 'All Locations' || f.Location === selectedLoc;
+      if (locMatch) {
+        if (!aggregated[f.fy]) {
+          aggregated[f.fy] = { fy: f.fy, load: 0, labour: 0, part: 0 };
+        }
+        aggregated[f.fy].load += (Number(f.load) || 0);
+        aggregated[f.fy].labour += (Number(f.labour) || 0);
+        aggregated[f.fy].part += (Number(f.part) || 0);
+      }
+    });
+
+    const years = Object.keys(aggregated).sort((a, b) => b.localeCompare(a));
+    return years.map(y => aggregated[y]);
+  }, [masterData, selectedLoc]);
+
   // Day-wise Trend target KPIs calculations
   const trendKpis = useMemo(() => {
     if (!masterData || !aggregatedData) return null;
@@ -1629,28 +1649,43 @@ export default function Home() {
               <table>
                 <thead>
                   <tr>
-                    <th>Financial Year</th>
-                    <th>Total Load</th>
-                    <th>Growth</th>
-                    <th>Labour Revenue</th>
-                    <th>Parts Revenue</th>
-                    <th>Total Revenue</th>
+                    <th>Trends</th>
+                    {processedFyTrends && processedFyTrends.map(fy => (
+                      <th key={fy.fy} style={{ textAlign: 'center' }}>{fy.fy}</th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {masterData?.fyTrends && masterData.fyTrends.map((f, idx) => {
-                    const rowG = idx < masterData.fyTrends.length - 1 ? calcGrowth(f.load, masterData.fyTrends[idx+1].load) : '0%';
-                    return (
-                      <tr key={idx}>
-                        <td style={{ fontWeight: '600' }}>{f.fy}</td>
-                        <td>{formatNumber(f.load)}</td>
-                        <td><span className={getGrowthClass(rowG)}>{rowG}</span></td>
-                        <td>{formatCurrency(f.labour)}</td>
-                        <td>{formatCurrency(f.part)}</td>
-                        <td style={{ fontWeight: '700', color: 'var(--accent)' }}>{formatCurrency((f.labour || 0) + (f.part || 0))}</td>
-                      </tr>
-                    );
-                  })}
+                  <tr>
+                    <td style={{ fontWeight: '600' }}>Load</td>
+                    {processedFyTrends && processedFyTrends.map(fy => (
+                      <td key={fy.fy} style={{ textAlign: 'center', color: 'var(--accent)', fontWeight: '600' }}>{formatNumber(fy.load)}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td style={{ fontWeight: '600' }}>Labour</td>
+                    {processedFyTrends && processedFyTrends.map(fy => (
+                      <td key={fy.fy} style={{ textAlign: 'center', color: 'var(--accent)', fontWeight: '600' }}>{formatCurrency(fy.labour)}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td style={{ fontWeight: '600' }}>Part</td>
+                    {processedFyTrends && processedFyTrends.map(fy => (
+                      <td key={fy.fy} style={{ textAlign: 'center', color: 'var(--accent)', fontWeight: '600' }}>{formatCurrency(fy.part)}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td style={{ fontWeight: '600' }}>Labour Per RO</td>
+                    {processedFyTrends && processedFyTrends.map(fy => (
+                      <td key={fy.fy} style={{ textAlign: 'center', color: 'var(--accent)', fontWeight: '600' }}>{fy.load > 0 ? '₹' + Math.round(fy.labour / fy.load).toLocaleString('en-IN') : '₹0'}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <td style={{ fontWeight: '600' }}>Parts Per RO</td>
+                    {processedFyTrends && processedFyTrends.map(fy => (
+                      <td key={fy.fy} style={{ textAlign: 'center', color: 'var(--accent)', fontWeight: '600' }}>{fy.load > 0 ? '₹' + Math.round(fy.part / fy.load).toLocaleString('en-IN') : '₹0'}</td>
+                    ))}
+                  </tr>
                 </tbody>
               </table>
             </div>
