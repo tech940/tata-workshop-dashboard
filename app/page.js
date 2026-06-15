@@ -341,6 +341,12 @@ export default function Home() {
   }, [activeSection, fetchOperationsData]);
 
   useEffect(() => {
+    if (vasOpenRoMode && (!opsOpenRos || opsOpenRos.length === 0)) {
+      fetchOperationsData();
+    }
+  }, [vasOpenRoMode, opsOpenRos, fetchOperationsData]);
+
+  useEffect(() => {
     if (perfModalOpen) {
       fetchForensicsData();
     }
