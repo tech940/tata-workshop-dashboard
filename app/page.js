@@ -99,7 +99,7 @@ export default function Home() {
 
   
   const aggregatedOpenRo = useMemo(() => {
-    if (!opsOpenRos || opsOpenRos.length === 0) return { byType: {}, byReason: {}, totalRow: null, reasonTotalRow: null };
+    if (!opsOpenRos || opsOpenRos.length === 0) return { byType: {}, byReason: [], totalRow: null, reasonTotalRow: null };
 
     const byType = {};
     const byReason = {};
@@ -1071,7 +1071,7 @@ export default function Home() {
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <style dangerouslySetInnerHTML={{__html: `
-        .fullscreen { position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; z-index: 9999 !important; overflow-y: auto !important; background: var(--bg) !important; margin: 0 !important; padding: 20px !important; border-radius: 0 !important; max-height: none !important; width: 100vw !important; height: 100vh !important; }
+        .fullscreen { position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important; z-index: 9999 !important; overflow-y: auto !important; background: var(--bg) !important; margin: 0 !important; padding: 20px !important; box-sizing: border-box !important; border-radius: 0 !important; max-height: none !important; width: 100vw !important; height: 100vh !important; }
       `}} />
       
       {/* Loading overlay spinner */}
