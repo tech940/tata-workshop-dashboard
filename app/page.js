@@ -1857,6 +1857,13 @@ export default function Home() {
               >
                 ⚙️ Mode: {vasTypeMode}
               </button>
+              <button 
+                onClick={() => setVasOpenRoMode(!vasOpenRoMode)} 
+                className="tab active" 
+                style={{ background: vasOpenRoMode ? 'var(--danger)' : '#2563eb', border: 'none', color: 'white', fontWeight: 'bold' }}
+              >
+                {vasOpenRoMode ? '📂 EXIT OPEN RO' : '📂 OPEN RO'}
+              </button>
             </div>
           </div>
 
