@@ -1457,10 +1457,10 @@ export default function Home() {
                       />
                     )}
                     <Line type="linear" name="This Year" dataKey="cy" stroke="#1e3a8a" strokeWidth={3.5} dot={{ r: 5, strokeWidth: 2.5, fill: 'var(--card)' }} activeDot={{ r: 7 }}>
-                      <LabelList dataKey="cy" position="top" style={{ fill: '#1e3a8a', fontSize: 11, fontWeight: 700 }} formatter={(val) => val > 0 ? (currentTrendMode === 'load' ? Math.round(val) : '') : ''} />
+                      <LabelList dataKey="cy" position="top" style={{ fill: '#1e3a8a', fontSize: 11, fontWeight: 700 }} formatter={(val) => val > 0 ? (currentTrendMode === 'load' ? Math.round(val) : (val >= 100000 ? (val/100000).toFixed(1) + 'L' : val >= 1000 ? (val/1000).toFixed(1) + 'K' : Math.round(val))) : ''} />
                     </Line>
                     <Line type="linear" name="Last Year" dataKey="ly" stroke="#22c55e" strokeWidth={3} dot={{ r: 4, strokeWidth: 2, fill: 'var(--card)' }} activeDot={{ r: 6 }}>
-                      <LabelList dataKey="ly" position="bottom" style={{ fill: '#22c55e', fontSize: 11, fontWeight: 600 }} formatter={(val) => val > 0 ? (currentTrendMode === 'load' ? Math.round(val) : '') : ''} />
+                      <LabelList dataKey="ly" position="bottom" style={{ fill: '#22c55e', fontSize: 11, fontWeight: 600 }} formatter={(val) => val > 0 ? (currentTrendMode === 'load' ? Math.round(val) : (val >= 100000 ? (val/100000).toFixed(1) + 'L' : val >= 1000 ? (val/1000).toFixed(1) + 'K' : Math.round(val))) : ''} />
                     </Line>
                   </LineChart>
                 </ResponsiveContainer>
