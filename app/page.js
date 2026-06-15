@@ -938,6 +938,12 @@ export default function Home() {
     return Array.from(new Set(flaggedInvoices.map(r => r.service_type).filter(Boolean))).sort();
   }, [flaggedInvoices]);
 
+  
+  const getPctColor = (pctStr) => {
+    const val = parseFloat(pctStr);
+    return isNaN(val) ? 'inherit' : (val >= 20 ? 'var(--success)' : 'var(--danger)');
+  };
+
   const handleDownloadCSV = () => {
     const headers = ['Sr', 'Branch', 'Type', 'Date', 'Bill No', 'Model', 'Reg Number', 'Advisor', 'Labour Amt', 'Part Amt', 'Discount', 'Discount %', 'Alerts', 'Score'];
     const rows = filteredForensicsList.map((r, i) => {
@@ -1759,7 +1765,7 @@ export default function Home() {
       {activeSection === 'vas' && aggregatedData && (
         <div id="section-vas">
           <div style={{ background: 'var(--navy)', color: 'var(--navy-text)', padding: '10px 20px', borderRadius: '8px', marginBottom: '15px', fontWeight: 600, fontSize: '14px', letterSpacing: '0.5px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span>Detailed VAS & Workshop Performance</span>
+            <span>WORKSHOP REVENUE ANALYSIS</span>
             
             {/* View selectors */}
             <div style={{ display: 'flex', gap: '8px' }}>
@@ -1780,7 +1786,14 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="card">
+          <div className="card" style={{ marginTop: '0', borderTopLeftRadius: '0', borderTopRightRadius: '0' }}>
+            
+            {/* Subheader */}
+            <div style={{ background: 'var(--navy)', color: 'white', padding: '8px 20px', fontSize: '12px', fontWeight: 600, display: 'flex', justifyContent: 'space-between', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+              <span>REVENUE PERFORMANCE (VAS / WA / WB)</span>
+              <span style={{ fontWeight: 400 }}>Live Calculation from Main Data</span>
+            </div>
+
             <div className="table-container" style={{ maxHeight: '70vh' }}>
               <table>
                 <thead>
@@ -1830,19 +1843,19 @@ export default function Home() {
                           <td>{formatCurrency(g.lab_cy)}</td>
                           <td>{((g.lab_cy / totLab) * 100).toFixed(0)}%</td>
                           <td>{g.cy > 0 ? '₹' + Math.round(g.lab_cy / g.cy).toLocaleString() : '₹0'}</td>
-                          <td>{formatCurrency(g.vas_cy)}</td>
-                          <td>{g.lab_cy > 0 ? ((g.vas_cy / g.lab_cy) * 100).toFixed(0) : 0}%</td>
+                          <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(g.vas_cy)}</td>
+                          <td style={{ color: getPctColor(g.lab_cy > 0 ? ((g.vas_cy / g.lab_cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{g.lab_cy > 0 ? ((g.vas_cy / g.lab_cy) * 100).toFixed(0) : 0}%</td>
                           <td>{g.cy > 0 ? '₹' + Math.round((g.lab_cy - g.vas_cy) / g.cy).toLocaleString() : '₹0'}</td>
-                          <td>{formatCurrency(g.lab_cy - g.vas_cy)}</td>
+                          <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(g.lab_cy - g.vas_cy)}</td>
                           <td>{formatCurrency(g.part_cy)}</td>
                           <td>{g.cy > 0 ? '₹' + Math.round(g.part_cy / g.cy).toLocaleString() : '₹0'}</td>
                           <td style={{ color: 'var(--danger)', fontWeight: '700' }}>{formatCurrency(g.disc_cy)}</td>
                           <td>{formatNumber(g.wa_count_cy)}</td>
-                          <td>{formatCurrency(g.wa_cy)}</td>
-                          <td>{g.cy > 0 ? ((g.wa_count_cy / g.cy) * 100).toFixed(0) : 0}%</td>
+                          <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(g.wa_cy)}</td>
+                          <td style={{ color: getPctColor(g.cy > 0 ? ((g.wa_count_cy / g.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{g.cy > 0 ? ((g.wa_count_cy / g.cy) * 100).toFixed(0) : 0}%</td>
                           <td>{formatNumber(g.wb_count_cy)}</td>
-                          <td>{formatCurrency(g.wb_cy)}</td>
-                          <td>{g.cy > 0 ? ((g.wb_count_cy / g.cy) * 100).toFixed(0) : 0}%</td>
+                          <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(g.wb_cy)}</td>
+                          <td style={{ color: getPctColor(g.cy > 0 ? ((g.wb_count_cy / g.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{g.cy > 0 ? ((g.wb_count_cy / g.cy) * 100).toFixed(0) : 0}%</td>
                         </tr>
                         {expanded && vasTableData.grouped[saName].items.map(child => (
                           <tr key={child.Location} className="child-row">
@@ -1852,19 +1865,19 @@ export default function Home() {
                             <td>{formatCurrency(child.lab_cy)}</td>
                             <td>{((child.lab_cy / totLab) * 100).toFixed(0)}%</td>
                             <td>{child.cy > 0 ? '₹' + Math.round(child.lab_cy / child.cy).toLocaleString() : '₹0'}</td>
-                            <td>{formatCurrency(child.vas_cy)}</td>
-                            <td>{child.lab_cy > 0 ? ((child.vas_cy / child.lab_cy) * 100).toFixed(0) : 0}%</td>
+                            <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(child.vas_cy)}</td>
+                            <td style={{ color: getPctColor(child.lab_cy > 0 ? ((child.vas_cy / child.lab_cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{child.lab_cy > 0 ? ((child.vas_cy / child.lab_cy) * 100).toFixed(0) : 0}%</td>
                             <td>{child.cy > 0 ? '₹' + Math.round((child.lab_cy - child.vas_cy) / child.cy).toLocaleString() : '₹0'}</td>
-                            <td>{formatCurrency(child.lab_cy - child.vas_cy)}</td>
+                            <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(child.lab_cy - child.vas_cy)}</td>
                             <td>{formatCurrency(child.part_cy)}</td>
                             <td>{child.cy > 0 ? '₹' + Math.round(child.part_cy / child.cy).toLocaleString() : '₹0'}</td>
                             <td style={{ color: 'var(--danger)', fontWeight: '700' }}>{formatCurrency(child.disc_cy)}</td>
                             <td>{formatNumber(child.wa_count_cy)}</td>
-                            <td>{formatCurrency(child.wa_cy)}</td>
-                            <td>{child.cy > 0 ? ((child.wa_count_cy / child.cy) * 100).toFixed(0) : 0}%</td>
+                            <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(child.wa_cy)}</td>
+                            <td style={{ color: getPctColor(child.cy > 0 ? ((child.wa_count_cy / child.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{child.cy > 0 ? ((child.wa_count_cy / child.cy) * 100).toFixed(0) : 0}%</td>
                             <td>{formatNumber(child.wb_count_cy)}</td>
-                            <td>{formatCurrency(child.wb_cy)}</td>
-                            <td>{child.cy > 0 ? ((child.wb_count_cy / child.cy) * 100).toFixed(0) : 0}%</td>
+                            <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(child.wb_cy)}</td>
+                            <td style={{ color: getPctColor(child.cy > 0 ? ((child.wb_count_cy / child.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{child.cy > 0 ? ((child.wb_count_cy / child.cy) * 100).toFixed(0) : 0}%</td>
                           </tr>
                         ))}
                       </>
@@ -1895,19 +1908,19 @@ export default function Home() {
                               <td>{formatCurrency(g.lab_cy)}</td>
                               <td>{((g.lab_cy / totLab) * 100).toFixed(0)}%</td>
                               <td>{g.cy > 0 ? '₹' + Math.round(g.lab_cy / g.cy).toLocaleString() : '₹0'}</td>
-                              <td>{formatCurrency(g.vas_cy)}</td>
-                              <td>{g.lab_cy > 0 ? ((g.vas_cy / g.lab_cy) * 100).toFixed(0) : 0}%</td>
+                              <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(g.vas_cy)}</td>
+                              <td style={{ color: getPctColor(g.lab_cy > 0 ? ((g.vas_cy / g.lab_cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{g.lab_cy > 0 ? ((g.vas_cy / g.lab_cy) * 100).toFixed(0) : 0}%</td>
                               <td>{g.cy > 0 ? '₹' + Math.round((g.lab_cy - g.vas_cy) / g.cy).toLocaleString() : '₹0'}</td>
-                              <td>{formatCurrency(g.lab_cy - g.vas_cy)}</td>
+                              <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(g.lab_cy - g.vas_cy)}</td>
                               <td>{formatCurrency(g.part_cy)}</td>
                               <td>{g.cy > 0 ? '₹' + Math.round(g.part_cy / g.cy).toLocaleString() : '₹0'}</td>
                               <td style={{ color: 'var(--danger)', fontWeight: '700' }}>{formatCurrency(g.disc_cy)}</td>
                               <td>{formatNumber(g.wa_count_cy)}</td>
-                              <td>{formatCurrency(g.wa_cy)}</td>
-                              <td>{g.cy > 0 ? ((g.wa_count_cy / g.cy) * 100).toFixed(0) : 0}%</td>
+                              <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(g.wa_cy)}</td>
+                              <td style={{ color: getPctColor(g.cy > 0 ? ((g.wa_count_cy / g.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{g.cy > 0 ? ((g.wa_count_cy / g.cy) * 100).toFixed(0) : 0}%</td>
                               <td>{formatNumber(g.wb_count_cy)}</td>
-                              <td>{formatCurrency(g.wb_cy)}</td>
-                              <td>{g.cy > 0 ? ((g.wb_count_cy / g.cy) * 100).toFixed(0) : 0}%</td>
+                              <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(g.wb_cy)}</td>
+                              <td style={{ color: getPctColor(g.cy > 0 ? ((g.wb_count_cy / g.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{g.cy > 0 ? ((g.wb_count_cy / g.cy) * 100).toFixed(0) : 0}%</td>
                             </tr>
                             {expanded && vasTableData.grouped[gn].items.map(child => (
                               <tr key={child.Location} className="child-row">
@@ -1917,19 +1930,19 @@ export default function Home() {
                                 <td>{formatCurrency(child.lab_cy)}</td>
                                 <td>{((child.lab_cy / totLab) * 100).toFixed(0)}%</td>
                                 <td>{child.cy > 0 ? '₹' + Math.round(child.lab_cy / child.cy).toLocaleString() : '₹0'}</td>
-                                <td>{formatCurrency(child.vas_cy)}</td>
-                                <td>{child.lab_cy > 0 ? ((child.vas_cy / child.lab_cy) * 100).toFixed(0) : 0}%</td>
+                                <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(child.vas_cy)}</td>
+                                <td style={{ color: getPctColor(child.lab_cy > 0 ? ((child.vas_cy / child.lab_cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{child.lab_cy > 0 ? ((child.vas_cy / child.lab_cy) * 100).toFixed(0) : 0}%</td>
                                 <td>{child.cy > 0 ? '₹' + Math.round((child.lab_cy - child.vas_cy) / child.cy).toLocaleString() : '₹0'}</td>
-                                <td>{formatCurrency(child.lab_cy - child.vas_cy)}</td>
+                                <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(child.lab_cy - child.vas_cy)}</td>
                                 <td>{formatCurrency(child.part_cy)}</td>
                                 <td>{child.cy > 0 ? '₹' + Math.round(child.part_cy / child.cy).toLocaleString() : '₹0'}</td>
                                 <td style={{ color: 'var(--danger)', fontWeight: '700' }}>{formatCurrency(child.disc_cy)}</td>
                                 <td>{formatNumber(child.wa_count_cy)}</td>
-                                <td>{formatCurrency(child.wa_cy)}</td>
-                                <td>{child.cy > 0 ? ((child.wa_count_cy / child.cy) * 100).toFixed(0) : 0}%</td>
+                                <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(child.wa_cy)}</td>
+                                <td style={{ color: getPctColor(child.cy > 0 ? ((child.wa_count_cy / child.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{child.cy > 0 ? ((child.wa_count_cy / child.cy) * 100).toFixed(0) : 0}%</td>
                                 <td>{formatNumber(child.wb_count_cy)}</td>
-                                <td>{formatCurrency(child.wb_cy)}</td>
-                                <td>{child.cy > 0 ? ((child.wb_count_cy / child.cy) * 100).toFixed(0) : 0}%</td>
+                                <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(child.wb_cy)}</td>
+                                <td style={{ color: getPctColor(child.cy > 0 ? ((child.wb_count_cy / child.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{child.cy > 0 ? ((child.wb_count_cy / child.cy) * 100).toFixed(0) : 0}%</td>
                               </tr>
                             ))}
                           </>
@@ -1944,19 +1957,19 @@ export default function Home() {
                         <td>{formatCurrency(vasTableData.mech1.lab_cy)}</td>
                         <td>{((vasTableData.mech1.lab_cy / (aggregatedData.total.lab_cy || 1)) * 100).toFixed(0)}%</td>
                         <td>{vasTableData.mech1.cy > 0 ? '₹' + Math.round(vasTableData.mech1.lab_cy / vasTableData.mech1.cy).toLocaleString() : '₹0'}</td>
-                        <td>{formatCurrency(vasTableData.mech1.vas_cy)}</td>
-                        <td>{vasTableData.mech1.lab_cy > 0 ? ((vasTableData.mech1.vas_cy / vasTableData.mech1.lab_cy) * 100).toFixed(0) : 0}%</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.mech1.vas_cy)}</td>
+                        <td style={{ color: getPctColor(vasTableData.mech1.lab_cy > 0 ? ((vasTableData.mech1.vas_cy / vasTableData.mech1.lab_cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{vasTableData.mech1.lab_cy > 0 ? ((vasTableData.mech1.vas_cy / vasTableData.mech1.lab_cy) * 100).toFixed(0) : 0}%</td>
                         <td>{vasTableData.mech1.cy > 0 ? '₹' + Math.round((vasTableData.mech1.lab_cy - vasTableData.mech1.vas_cy) / vasTableData.mech1.cy).toLocaleString() : '₹0'}</td>
-                        <td>{formatCurrency(vasTableData.mech1.lab_cy - vasTableData.mech1.vas_cy)}</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.mech1.lab_cy - vasTableData.mech1.vas_cy)}</td>
                         <td>{formatCurrency(vasTableData.mech1.part_cy)}</td>
                         <td>{vasTableData.mech1.cy > 0 ? '₹' + Math.round(vasTableData.mech1.part_cy / vasTableData.mech1.cy).toLocaleString() : '₹0'}</td>
                         <td style={{ color: 'var(--danger)', fontWeight: '700' }}>{formatCurrency(vasTableData.mech1.disc_cy)}</td>
                         <td>{formatNumber(vasTableData.mech1.wa_count_cy)}</td>
-                        <td>{formatCurrency(vasTableData.mech1.wa_cy)}</td>
-                        <td>{vasTableData.mech1.cy > 0 ? ((vasTableData.mech1.wa_count_cy / vasTableData.mech1.cy) * 100).toFixed(0) : 0}%</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.mech1.wa_cy)}</td>
+                        <td style={{ color: getPctColor(vasTableData.mech1.cy > 0 ? ((vasTableData.mech1.wa_count_cy / vasTableData.mech1.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{vasTableData.mech1.cy > 0 ? ((vasTableData.mech1.wa_count_cy / vasTableData.mech1.cy) * 100).toFixed(0) : 0}%</td>
                         <td>{formatNumber(vasTableData.mech1.wb_count_cy)}</td>
-                        <td>{formatCurrency(vasTableData.mech1.wb_cy)}</td>
-                        <td>{vasTableData.mech1.cy > 0 ? ((vasTableData.mech1.wb_count_cy / vasTableData.mech1.cy) * 100).toFixed(0) : 0}%</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.mech1.wb_cy)}</td>
+                        <td style={{ color: getPctColor(vasTableData.mech1.cy > 0 ? ((vasTableData.mech1.wb_count_cy / vasTableData.mech1.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{vasTableData.mech1.cy > 0 ? ((vasTableData.mech1.wb_count_cy / vasTableData.mech1.cy) * 100).toFixed(0) : 0}%</td>
                       </tr>
 
                       {/* Others Row */}
@@ -1969,19 +1982,19 @@ export default function Home() {
                         <td>{formatCurrency(vasTableData.grouped['Others'].totals.lab_cy)}</td>
                         <td>{((vasTableData.grouped['Others'].totals.lab_cy / (aggregatedData.total.lab_cy || 1)) * 100).toFixed(0)}%</td>
                         <td>{vasTableData.grouped['Others'].totals.cy > 0 ? '₹' + Math.round(vasTableData.grouped['Others'].totals.lab_cy / vasTableData.grouped['Others'].totals.cy).toLocaleString() : '₹0'}</td>
-                        <td>{formatCurrency(vasTableData.grouped['Others'].totals.vas_cy)}</td>
-                        <td>{vasTableData.grouped['Others'].totals.lab_cy > 0 ? ((vasTableData.grouped['Others'].totals.vas_cy / vasTableData.grouped['Others'].totals.lab_cy) * 100).toFixed(0) : 0}%</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.grouped['Others'].totals.vas_cy)}</td>
+                        <td style={{ color: getPctColor(vasTableData.grouped['Others'].totals.lab_cy > 0 ? ((vasTableData.grouped['Others'].totals.vas_cy / vasTableData.grouped['Others'].totals.lab_cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{vasTableData.grouped['Others'].totals.lab_cy > 0 ? ((vasTableData.grouped['Others'].totals.vas_cy / vasTableData.grouped['Others'].totals.lab_cy) * 100).toFixed(0) : 0}%</td>
                         <td>{vasTableData.grouped['Others'].totals.cy > 0 ? '₹' + Math.round((vasTableData.grouped['Others'].totals.lab_cy - vasTableData.grouped['Others'].totals.vas_cy) / vasTableData.grouped['Others'].totals.cy).toLocaleString() : '₹0'}</td>
-                        <td>{formatCurrency(vasTableData.grouped['Others'].totals.lab_cy - vasTableData.grouped['Others'].totals.vas_cy)}</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.grouped['Others'].totals.lab_cy - vasTableData.grouped['Others'].totals.vas_cy)}</td>
                         <td>{formatCurrency(vasTableData.grouped['Others'].totals.part_cy)}</td>
                         <td>{vasTableData.grouped['Others'].totals.cy > 0 ? '₹' + Math.round(vasTableData.grouped['Others'].totals.part_cy / vasTableData.grouped['Others'].totals.cy).toLocaleString() : '₹0'}</td>
                         <td style={{ color: 'var(--danger)', fontWeight: '700' }}>{formatCurrency(vasTableData.grouped['Others'].totals.disc_cy)}</td>
                         <td>{formatNumber(vasTableData.grouped['Others'].totals.wa_count_cy)}</td>
-                        <td>{formatCurrency(vasTableData.grouped['Others'].totals.wa_cy)}</td>
-                        <td>{vasTableData.grouped['Others'].totals.cy > 0 ? ((vasTableData.grouped['Others'].totals.wa_count_cy / vasTableData.grouped['Others'].totals.cy) * 100).toFixed(0) : 0}%</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.grouped['Others'].totals.wa_cy)}</td>
+                        <td style={{ color: getPctColor(vasTableData.grouped['Others'].totals.cy > 0 ? ((vasTableData.grouped['Others'].totals.wa_count_cy / vasTableData.grouped['Others'].totals.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{vasTableData.grouped['Others'].totals.cy > 0 ? ((vasTableData.grouped['Others'].totals.wa_count_cy / vasTableData.grouped['Others'].totals.cy) * 100).toFixed(0) : 0}%</td>
                         <td>{formatNumber(vasTableData.grouped['Others'].totals.wb_count_cy)}</td>
-                        <td>{formatCurrency(vasTableData.grouped['Others'].totals.wb_cy)}</td>
-                        <td>{vasTableData.grouped['Others'].totals.cy > 0 ? ((vasTableData.grouped['Others'].totals.wb_count_cy / vasTableData.grouped['Others'].totals.cy) * 100).toFixed(0) : 0}%</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.grouped['Others'].totals.wb_cy)}</td>
+                        <td style={{ color: getPctColor(vasTableData.grouped['Others'].totals.cy > 0 ? ((vasTableData.grouped['Others'].totals.wb_count_cy / vasTableData.grouped['Others'].totals.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{vasTableData.grouped['Others'].totals.cy > 0 ? ((vasTableData.grouped['Others'].totals.wb_count_cy / vasTableData.grouped['Others'].totals.cy) * 100).toFixed(0) : 0}%</td>
                       </tr>
 
                       {/* Mech Total (Incl. Others) row */}
@@ -1992,19 +2005,19 @@ export default function Home() {
                         <td>{formatCurrency(vasTableData.mech2.lab_cy)}</td>
                         <td>{((vasTableData.mech2.lab_cy / (aggregatedData.total.lab_cy || 1)) * 100).toFixed(0)}%</td>
                         <td>{vasTableData.mech2.cy > 0 ? '₹' + Math.round(vasTableData.mech2.lab_cy / vasTableData.mech2.cy).toLocaleString() : '₹0'}</td>
-                        <td>{formatCurrency(vasTableData.mech2.vas_cy)}</td>
-                        <td>{vasTableData.mech2.lab_cy > 0 ? ((vasTableData.mech2.vas_cy / vasTableData.mech2.lab_cy) * 100).toFixed(0) : 0}%</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.mech2.vas_cy)}</td>
+                        <td style={{ color: getPctColor(vasTableData.mech2.lab_cy > 0 ? ((vasTableData.mech2.vas_cy / vasTableData.mech2.lab_cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{vasTableData.mech2.lab_cy > 0 ? ((vasTableData.mech2.vas_cy / vasTableData.mech2.lab_cy) * 100).toFixed(0) : 0}%</td>
                         <td>{vasTableData.mech2.cy > 0 ? '₹' + Math.round((vasTableData.mech2.lab_cy - vasTableData.mech2.vas_cy) / vasTableData.mech2.cy).toLocaleString() : '₹0'}</td>
-                        <td>{formatCurrency(vasTableData.mech2.lab_cy - vasTableData.mech2.vas_cy)}</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.mech2.lab_cy - vasTableData.mech2.vas_cy)}</td>
                         <td>{formatCurrency(vasTableData.mech2.part_cy)}</td>
                         <td>{vasTableData.mech2.cy > 0 ? '₹' + Math.round(vasTableData.mech2.part_cy / vasTableData.mech2.cy).toLocaleString() : '₹0'}</td>
                         <td style={{ color: 'var(--danger)', fontWeight: '700' }}>{formatCurrency(vasTableData.mech2.disc_cy)}</td>
                         <td>{formatNumber(vasTableData.mech2.wa_count_cy)}</td>
-                        <td>{formatCurrency(vasTableData.mech2.wa_cy)}</td>
-                        <td>{vasTableData.mech2.cy > 0 ? ((vasTableData.mech2.wa_count_cy / vasTableData.mech2.cy) * 100).toFixed(0) : 0}%</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.mech2.wa_cy)}</td>
+                        <td style={{ color: getPctColor(vasTableData.mech2.cy > 0 ? ((vasTableData.mech2.wa_count_cy / vasTableData.mech2.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{vasTableData.mech2.cy > 0 ? ((vasTableData.mech2.wa_count_cy / vasTableData.mech2.cy) * 100).toFixed(0) : 0}%</td>
                         <td>{formatNumber(vasTableData.mech2.wb_count_cy)}</td>
-                        <td>{formatCurrency(vasTableData.mech2.wb_cy)}</td>
-                        <td>{vasTableData.mech2.cy > 0 ? ((vasTableData.mech2.wb_count_cy / vasTableData.mech2.cy) * 100).toFixed(0) : 0}%</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.mech2.wb_cy)}</td>
+                        <td style={{ color: getPctColor(vasTableData.mech2.cy > 0 ? ((vasTableData.mech2.wb_count_cy / vasTableData.mech2.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{vasTableData.mech2.cy > 0 ? ((vasTableData.mech2.wb_count_cy / vasTableData.mech2.cy) * 100).toFixed(0) : 0}%</td>
                       </tr>
 
                       {/* Accidental Row */}
@@ -2017,19 +2030,19 @@ export default function Home() {
                         <td>{formatCurrency(vasTableData.grouped['Accidental'].totals.lab_cy)}</td>
                         <td>{((vasTableData.grouped['Accidental'].totals.lab_cy / (aggregatedData.total.lab_cy || 1)) * 100).toFixed(0)}%</td>
                         <td>{vasTableData.grouped['Accidental'].totals.cy > 0 ? '₹' + Math.round(vasTableData.grouped['Accidental'].totals.lab_cy / vasTableData.grouped['Accidental'].totals.cy).toLocaleString() : '₹0'}</td>
-                        <td>{formatCurrency(vasTableData.grouped['Accidental'].totals.vas_cy)}</td>
-                        <td>{vasTableData.grouped['Accidental'].totals.lab_cy > 0 ? ((vasTableData.grouped['Accidental'].totals.vas_cy / vasTableData.grouped['Accidental'].totals.lab_cy) * 100).toFixed(0) : 0}%</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.grouped['Accidental'].totals.vas_cy)}</td>
+                        <td style={{ color: getPctColor(vasTableData.grouped['Accidental'].totals.lab_cy > 0 ? ((vasTableData.grouped['Accidental'].totals.vas_cy / vasTableData.grouped['Accidental'].totals.lab_cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{vasTableData.grouped['Accidental'].totals.lab_cy > 0 ? ((vasTableData.grouped['Accidental'].totals.vas_cy / vasTableData.grouped['Accidental'].totals.lab_cy) * 100).toFixed(0) : 0}%</td>
                         <td>{vasTableData.grouped['Accidental'].totals.cy > 0 ? '₹' + Math.round((vasTableData.grouped['Accidental'].totals.lab_cy - vasTableData.grouped['Accidental'].totals.vas_cy) / vasTableData.grouped['Accidental'].totals.cy).toLocaleString() : '₹0'}</td>
-                        <td>{formatCurrency(vasTableData.grouped['Accidental'].totals.lab_cy - vasTableData.grouped['Accidental'].totals.vas_cy)}</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.grouped['Accidental'].totals.lab_cy - vasTableData.grouped['Accidental'].totals.vas_cy)}</td>
                         <td>{formatCurrency(vasTableData.grouped['Accidental'].totals.part_cy)}</td>
                         <td>{vasTableData.grouped['Accidental'].totals.cy > 0 ? '₹' + Math.round(vasTableData.grouped['Accidental'].totals.part_cy / vasTableData.grouped['Accidental'].totals.cy).toLocaleString() : '₹0'}</td>
                         <td style={{ color: 'var(--danger)', fontWeight: '700' }}>{formatCurrency(vasTableData.grouped['Accidental'].totals.disc_cy)}</td>
                         <td>{formatNumber(vasTableData.grouped['Accidental'].totals.wa_count_cy)}</td>
-                        <td>{formatCurrency(vasTableData.grouped['Accidental'].totals.wa_cy)}</td>
-                        <td>{vasTableData.grouped['Accidental'].totals.cy > 0 ? ((vasTableData.grouped['Accidental'].totals.wa_count_cy / vasTableData.grouped['Accidental'].totals.cy) * 100).toFixed(0) : 0}%</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.grouped['Accidental'].totals.wa_cy)}</td>
+                        <td style={{ color: getPctColor(vasTableData.grouped['Accidental'].totals.cy > 0 ? ((vasTableData.grouped['Accidental'].totals.wa_count_cy / vasTableData.grouped['Accidental'].totals.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{vasTableData.grouped['Accidental'].totals.cy > 0 ? ((vasTableData.grouped['Accidental'].totals.wa_count_cy / vasTableData.grouped['Accidental'].totals.cy) * 100).toFixed(0) : 0}%</td>
                         <td>{formatNumber(vasTableData.grouped['Accidental'].totals.wb_count_cy)}</td>
-                        <td>{formatCurrency(vasTableData.grouped['Accidental'].totals.wb_cy)}</td>
-                        <td>{vasTableData.grouped['Accidental'].totals.cy > 0 ? ((vasTableData.grouped['Accidental'].totals.wb_count_cy / vasTableData.grouped['Accidental'].totals.cy) * 100).toFixed(0) : 0}%</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.grouped['Accidental'].totals.wb_cy)}</td>
+                        <td style={{ color: getPctColor(vasTableData.grouped['Accidental'].totals.cy > 0 ? ((vasTableData.grouped['Accidental'].totals.wb_count_cy / vasTableData.grouped['Accidental'].totals.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{vasTableData.grouped['Accidental'].totals.cy > 0 ? ((vasTableData.grouped['Accidental'].totals.wb_count_cy / vasTableData.grouped['Accidental'].totals.cy) * 100).toFixed(0) : 0}%</td>
                       </tr>
 
                       {/* Grand Total Row */}
@@ -2040,19 +2053,19 @@ export default function Home() {
                         <td>{formatCurrency(vasTableData.totals.lab_cy)}</td>
                         <td>100%</td>
                         <td>{vasTableData.totals.cy > 0 ? '₹' + Math.round(vasTableData.totals.lab_cy / vasTableData.totals.cy).toLocaleString() : '₹0'}</td>
-                        <td>{formatCurrency(vasTableData.totals.vas_cy)}</td>
-                        <td>{vasTableData.totals.lab_cy > 0 ? ((vasTableData.totals.vas_cy / vasTableData.totals.lab_cy) * 100).toFixed(0) : 0}%</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.totals.vas_cy)}</td>
+                        <td style={{ color: getPctColor(vasTableData.totals.lab_cy > 0 ? ((vasTableData.totals.vas_cy / vasTableData.totals.lab_cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{vasTableData.totals.lab_cy > 0 ? ((vasTableData.totals.vas_cy / vasTableData.totals.lab_cy) * 100).toFixed(0) : 0}%</td>
                         <td>{vasTableData.totals.cy > 0 ? '₹' + Math.round((vasTableData.totals.lab_cy - vasTableData.totals.vas_cy) / vasTableData.totals.cy).toLocaleString() : '₹0'}</td>
-                        <td>{formatCurrency(vasTableData.totals.lab_cy - vasTableData.totals.vas_cy)}</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.totals.lab_cy - vasTableData.totals.vas_cy)}</td>
                         <td>{formatCurrency(vasTableData.totals.part_cy)}</td>
                         <td>{vasTableData.totals.cy > 0 ? '₹' + Math.round(vasTableData.totals.part_cy / vasTableData.totals.cy).toLocaleString() : '₹0'}</td>
                         <td style={{ color: 'var(--danger)', fontWeight: '700' }}>{formatCurrency(vasTableData.totals.disc_cy)}</td>
                         <td>{formatNumber(vasTableData.totals.wa_count_cy)}</td>
-                        <td>{formatCurrency(vasTableData.totals.wa_cy)}</td>
-                        <td>{vasTableData.totals.cy > 0 ? ((vasTableData.totals.wa_count_cy / vasTableData.totals.cy) * 100).toFixed(0) : 0}%</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.totals.wa_cy)}</td>
+                        <td style={{ color: getPctColor(vasTableData.totals.cy > 0 ? ((vasTableData.totals.wa_count_cy / vasTableData.totals.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{vasTableData.totals.cy > 0 ? ((vasTableData.totals.wa_count_cy / vasTableData.totals.cy) * 100).toFixed(0) : 0}%</td>
                         <td>{formatNumber(vasTableData.totals.wb_count_cy)}</td>
-                        <td>{formatCurrency(vasTableData.totals.wb_cy)}</td>
-                        <td>{vasTableData.totals.cy > 0 ? ((vasTableData.totals.wb_count_cy / vasTableData.totals.cy) * 100).toFixed(0) : 0}%</td>
+                        <td style={{ color: '#3b82f6', fontWeight: '600' }}>{formatCurrency(vasTableData.totals.wb_cy)}</td>
+                        <td style={{ color: getPctColor(vasTableData.totals.cy > 0 ? ((vasTableData.totals.wb_count_cy / vasTableData.totals.cy) * 100).toFixed(0) : 0), fontWeight: '600' }}>{vasTableData.totals.cy > 0 ? ((vasTableData.totals.wb_count_cy / vasTableData.totals.cy) * 100).toFixed(0) : 0}%</td>
                       </tr>
                     </>
                   )}
@@ -2349,7 +2362,14 @@ export default function Home() {
           </div>
 
           {/* Forensic Invoices Registry Table */}
-          <div className="card">
+          <div className="card" style={{ marginTop: '0', borderTopLeftRadius: '0', borderTopRightRadius: '0' }}>
+            
+            {/* Subheader */}
+            <div style={{ background: 'var(--navy)', color: 'white', padding: '8px 20px', fontSize: '12px', fontWeight: 600, display: 'flex', justifyContent: 'space-between', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+              <span>REVENUE PERFORMANCE (VAS / WA / WB)</span>
+              <span style={{ fontWeight: 400 }}>Live Calculation from Main Data</span>
+            </div>
+
             <div className="table-container" style={{ maxHeight: '60vh' }}>
               <table>
                 <thead>
