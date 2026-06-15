@@ -938,8 +938,13 @@ export default function Home() {
           monthlyAdvisors: new Set([s.Location]) 
         };
       });
-      return { grouped, sortedKeys: Object.keys(grouped).sort((a, b) => grouped[b].totals.cy - grouped[a].totals.cy) };
-    } else {
+      return { 
+          grouped, 
+          sortedKeys: Object.keys(grouped)
+            .filter(k => grouped[k].totals.cy > 0)
+            .sort((a, b) => grouped[b].totals.cy - grouped[a].totals.cy) 
+        };
+      } else {
       // Group by categories
       ['Paid Services', 'Free Services', 'Running Repairs', 'Accidental', 'Others'].forEach(gn => {
         grouped[gn] = { items: [], totals: createEmpty(), advisors: new Set(), monthlyAdvisors: new Set() };
