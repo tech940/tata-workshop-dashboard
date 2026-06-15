@@ -80,6 +80,8 @@ export default function Home() {
   const [opsMemberships, setOpsMemberships] = useState([]);
   const [opsAmc, setOpsAmc] = useState([]);
   const [opsEw, setOpsEw] = useState([]);
+  const [opsAmcSummary, setOpsAmcSummary] = useState([]);
+  const [opsEwSummary, setOpsEwSummary] = useState([]);
   const [loadingOps, setLoadingOps] = useState(false);
 
   // Forensic Audit Modal state
@@ -308,6 +310,8 @@ export default function Home() {
       setOpsMemberships(progData.memberships?.recent || []);
       setOpsAmc(progData.amc?.recent || []);
       setOpsEw(progData.ew?.recent || []);
+      setOpsAmcSummary(progData.amc?.summary || []);
+      setOpsEwSummary(progData.ew?.summaryByLocation || []);
     } catch (e) {
       console.error(e);
     } finally {
@@ -2304,50 +2308,68 @@ export default function Home() {
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr>
-                    <th style={{ textAlign: 'left', background: 'white', color: 'var(--navy)', fontWeight: 'bold' }}>LOCATION</th>
-                    <th style={{ background: 'white', color: 'var(--navy)', fontWeight: 'bold' }}>TOTAL LOAD</th>
-                    <th style={{ background: 'white', color: 'var(--navy)', fontWeight: 'normal' }}>EW</th>
-                    <th style={{ background: 'white', color: 'var(--navy)', fontWeight: 'normal' }}>EW %</th>
-                    <th style={{ background: 'white', color: 'var(--navy)', fontWeight: 'normal' }}>RSA</th>
-                    <th style={{ background: 'white', color: 'var(--navy)', fontWeight: 'normal' }}>RSA %</th>
-                    <th style={{ background: 'white', color: 'var(--navy)', fontWeight: 'normal' }}>AMC</th>
-                    <th style={{ background: 'white', color: 'var(--navy)', fontWeight: 'normal' }}>AMC%</th>
+                    <th style={{ textAlign: 'left' }}>LOCATION</th>
+                    <th>TOTAL LOAD</th>
+                    <th>EW</th>
+                    <th>EW %</th>
+                    <th>RSA</th>
+                    <th>RSA %</th>
+                    <th>AMC</th>
+                    <th>AMC%</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {aggregatedData && aggregatedData.locs ? aggregatedData.locs.map(loc => (
+                  {aggregatedData && aggregatedData.locs ? aggregatedData.locs.map(loc => {
+                    const totalLoad = loc.cy || 0;
+                    const ewObj = opsEwSummary.find(e => e.division === loc.Location) || { total_contracts: 0 };
+                    const amcObj = opsAmcSummary.find(a => a.division === loc.Location) || { total_contracts: 0 };
+                    const ewCount = ewObj.total_contracts;
+                    const amcCount = amcObj.total_contracts;
+                    const ewPct = totalLoad > 0 ? ((ewCount / totalLoad) * 100).toFixed(0) : 0;
+                    const amcPct = totalLoad > 0 ? ((amcCount / totalLoad) * 100).toFixed(0) : 0;
+                    return (
                     <tr key={loc.Location} style={{ borderBottom: '1px solid #e2e8f0' }}>
                       <td style={{ textAlign: 'left', fontWeight: 'bold', color: 'black' }}>{loc.Location}</td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
+                      <td>{formatNumber(totalLoad)}</td>
+                      <td>{formatNumber(ewCount)}</td>
+                      <td style={{ color: getPctColor(ewPct), fontWeight: 'bold' }}>{ewPct}%</td>
+                      <td>0</td>
+                      <td style={{ color: getPctColor(0), fontWeight: 'bold' }}>0%</td>
+                      <td>{formatNumber(amcCount)}</td>
+                      <td style={{ color: getPctColor(amcPct), fontWeight: 'bold' }}>{amcPct}%</td>
                     </tr>
-                  )) : ['JAMMU', 'KATHUA', 'SAMBA', 'POONCH'].map(loc => (
+                    );
+                  }) : ['JAMMU', 'KATHUA', 'SAMBA', 'POONCH'].map(loc => (
                     <tr key={loc} style={{ borderBottom: '1px solid #e2e8f0' }}>
                       <td style={{ textAlign: 'left', fontWeight: 'bold', color: 'black' }}>{loc}</td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
+                      <td>0</td>
+                      <td>0</td>
+                      <td>0%</td>
+                      <td>0</td>
+                      <td>0%</td>
+                      <td>0</td>
+                      <td>0%</td>
                     </tr>
                   ))}
-                  <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
-                    <td style={{ textAlign: 'left', fontWeight: 'bold', color: 'black' }}>GTOTAL</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                  </tr>
+                  {aggregatedData && aggregatedData.total ? (() => {
+                    const totalLoad = aggregatedData.total.cy || 0;
+                    const ewCount = opsEwSummary.reduce((acc, curr) => acc + (curr.total_contracts || 0), 0);
+                    const amcCount = opsAmcSummary.reduce((acc, curr) => acc + (curr.total_contracts || 0), 0);
+                    const ewPct = totalLoad > 0 ? ((ewCount / totalLoad) * 100).toFixed(0) : 0;
+                    const amcPct = totalLoad > 0 ? ((amcCount / totalLoad) * 100).toFixed(0) : 0;
+                    return (
+                    <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
+                      <td style={{ textAlign: 'left', fontWeight: 'bold', color: 'black' }}>GTOTAL</td>
+                      <td style={{ fontWeight: 'bold' }}>{formatNumber(totalLoad)}</td>
+                      <td style={{ fontWeight: 'bold' }}>{formatNumber(ewCount)}</td>
+                      <td style={{ color: getPctColor(ewPct), fontWeight: 'bold' }}>{ewPct}%</td>
+                      <td style={{ fontWeight: 'bold' }}>0</td>
+                      <td style={{ color: getPctColor(0), fontWeight: 'bold' }}>0%</td>
+                      <td style={{ fontWeight: 'bold' }}>{formatNumber(amcCount)}</td>
+                      <td style={{ color: getPctColor(amcPct), fontWeight: 'bold' }}>{amcPct}%</td>
+                    </tr>
+                    );
+                  })() : null}
                 </tbody>
               </table>
             </div>
