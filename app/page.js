@@ -109,15 +109,17 @@ export default function Home() {
 
     opsOpenRos.forEach(ro => {
       // Clean and normalize
-      let type = ro.service_type || 'Others';
-      if (type.toLowerCase().includes('accident') || type === 'ACC') type = 'Accident';
-      else if (type.toLowerCase().includes('free')) type = 'Free Services';
-      else if (type.toLowerCase().includes('paid')) type = 'Paid Service';
-      else if (type.toLowerCase().includes('running')) type = 'Running Repairs';
-      else type = 'Others';
+      let rawType = ro.service_type || 'Others';
+      let typeStr = String(rawType).toLowerCase();
+      let type = 'Others';
+      if (typeStr.includes('accident') || typeStr === 'acc') type = 'Accident';
+      else if (typeStr.includes('free')) type = 'Free Services';
+      else if (typeStr.includes('paid')) type = 'Paid Service';
+      else if (typeStr.includes('running')) type = 'Running Repairs';
 
-      let reason = ro.delay_reason || 'No Reason Specified';
-      if (reason.trim() === '') reason = 'No Reason Specified';
+      let rawReason = ro.delay_reason || 'No Reason Specified';
+      let reason = String(rawReason).trim();
+      if (reason === '') reason = 'No Reason Specified';
 
       const days = parseInt(ro.open_days) || 0;
       
