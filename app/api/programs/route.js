@@ -26,10 +26,10 @@ export async function GET(request) {
         const membershipRecentQuery = `
             SELECT 
                 Agreement_Created_Date as created_date,
-                Customer_Name as customer_name,
+                COALESCE(First_Name, Contact_Name) as customer_name,
                 Mwmbership as type,
-                Paid_Amt as amount,
-                Registration_Number as reg_no,
+                0 as amount,
+                Registration_No as reg_no,
                 Division as division
             FROM \`${projectDataset}.memberships_detailed1\`
             WHERE SAFE_CAST(Agreement_Created_Date AS DATE) >= SAFE_CAST(@startDate AS DATE)
