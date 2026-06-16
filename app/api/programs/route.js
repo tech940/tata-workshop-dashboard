@@ -46,24 +46,24 @@ export async function GET(request) {
                 COALESCE(SUM(Amc_Payment_Amount), 0) as total_revenue,
                 COALESCE(ROUND(AVG(Amc_Payment_Amount), 1), 0) as avg_price
             FROM \`${projectDataset}.Detail_AMC_Report\`
-            WHERE SAFE_CAST(Sale_Date AS DATE) >= SAFE_CAST(@startDate AS DATE)
-              AND SAFE_CAST(Sale_Date AS DATE) <= SAFE_CAST(@endDate AS DATE)
+            WHERE SAFE_CAST(Amc_Start_Date AS DATE) >= SAFE_CAST(@startDate AS DATE)
+              AND SAFE_CAST(Amc_Start_Date AS DATE) <= SAFE_CAST(@endDate AS DATE)
             GROUP BY division
             ORDER BY total_contracts DESC
         `;
 
         const amcRecentQuery = `
             SELECT 
-                SAFE_CAST(Sale_Date AS DATE) as start_date,
+                SAFE_CAST(Amc_Start_Date AS DATE) as start_date,
                 AMC_Contract_No as contract_no,
                 PPL as model,
                 Amc_Payment_Amount as amount,
                 Division as division,
                 Chassis_No as chassis_no
             FROM \`${projectDataset}.Detail_AMC_Report\`
-            WHERE SAFE_CAST(Sale_Date AS DATE) >= SAFE_CAST(@startDate AS DATE)
-              AND SAFE_CAST(Sale_Date AS DATE) <= SAFE_CAST(@endDate AS DATE)
-            ORDER BY Sale_Date DESC
+            WHERE SAFE_CAST(Amc_Start_Date AS DATE) >= SAFE_CAST(@startDate AS DATE)
+              AND SAFE_CAST(Amc_Start_Date AS DATE) <= SAFE_CAST(@endDate AS DATE)
+            ORDER BY Amc_Start_Date DESC
             LIMIT 15
         `;
 
