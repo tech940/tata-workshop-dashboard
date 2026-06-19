@@ -111,13 +111,7 @@ export default function Home() {
     }
     if (roStatusFilter && roStatusFilter !== 'All') {
       list = list.filter(r => {
-        const s = (r.status || '').toLowerCase();
-        if (roStatusFilter === 'Open') {
-          return s === 'open';
-        } else if (roStatusFilter === 'Closed') {
-          return s === 'closed';
-        }
-        return true;
+        return (r.status || 'Unknown').trim().toLowerCase() === roStatusFilter.toLowerCase();
       });
     }
     return list;
@@ -1930,7 +1924,7 @@ export default function Home() {
                         <span style={{ fontSize: '9px', marginLeft: '2px' }}>▼</span>
                       </button>
                       <div className={`loc-popup ${statusMenuOpen ? 'show' : ''}`} style={{ right: 0, top: 'calc(100% + 5px)', minWidth: '120px', backgroundColor: '#fff', color: '#333' }}>
-                        {['All', 'Open', 'Closed'].map(status => (
+                        {['All', ...Array.from(new Set(opsOpenRos.map(r => (r.status || 'Unknown').trim()))).sort()].map(status => (
                           <div 
                             key={status} 
                             className={`loc-option ${roStatusFilter === status ? 'active' : ''}`}
