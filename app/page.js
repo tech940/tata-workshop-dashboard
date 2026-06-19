@@ -1922,13 +1922,14 @@ export default function Home() {
           
         {vasOpenRoMode ? (
             <div style={{ marginTop: '0' }}>
-              <div className="card" style={{ marginTop: '0', borderTopLeftRadius: '0', borderTopRightRadius: '0' }}>
+              <div className="card" style={{ marginTop: '0', borderTopLeftRadius: '0', borderTopRightRadius: '0', overflow: 'visible' }}>
                 <div style={{ background: 'var(--navy)', color: 'white', padding: '8px 20px', fontSize: '12px', fontWeight: 600, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
                   <span>REVENUE PERFORMANCE (VAS / WA / WB)</span>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                     <div style={{ position: 'relative' }}>
                       <button onClick={() => { closeAllMenus(); setStatusMenuOpen(!statusMenuOpen); }} style={{ padding: '4px 12px', borderRadius: '15px', backgroundColor: 'rgba(255,255,255,0.2)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '5px' }}>
                         📋 Status: <span style={{ fontWeight: 700 }}>{roStatusFilter}</span>
+                        <span style={{ fontSize: '9px', marginLeft: '2px' }}>▼</span>
                       </button>
                       <div className={`loc-popup ${statusMenuOpen ? 'show' : ''}`} style={{ right: 0, top: 'calc(100% + 5px)', minWidth: '120px', backgroundColor: '#fff', color: '#333' }}>
                         {['All', 'Open', 'Closed'].map(status => (
@@ -1983,13 +1984,13 @@ export default function Home() {
                               <td style={{ textAlign: 'center', fontWeight: '600' }}>{(row.totalDays / row.count).toFixed(1)}</td>
                             </tr>
                             {expanded && row.items.map(it => {
-                               const textStr = `${it.delay_reason} Receiving Date : ${it.created_date?.value || it.created_date || '-'} PTD : - Claim date : - ${it.action_taken ? 'Action: '+it.action_taken : ''}`;
+                               const textStr = `${it.delay_reason} | Status: ${it.status || 'Unknown'} | Receiving Date : ${it.created_date?.value || it.created_date || '-'} PTD : - Claim date : - ${it.action_taken ? 'Action: '+it.action_taken : ''}`;
                                return (
                                   <tr key={it.jc_number} className="child-row" style={{ cursor: 'pointer' }} onClick={() => setSelectedVehicleDetails(it)}>
                                     <td style={{ textAlign: 'right', paddingRight: '20px', color: '#3b82f6', fontSize: '11px' }}>
                                       {it.reg_no} ({it.model})
                                     </td>
-                                    <td colSpan="5" style={{ textAlign: 'left', fontSize: '10px', color: '#6b7280' }}>
+                                    <td colSpan="5" style={{ fontSize: '11px', color: '#64748b' }}>
                                       <span style={{ color: '#f59e0b', marginRight: '5px' }}>⚠️</span>
                                       {textStr}
                                     </td>
