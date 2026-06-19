@@ -1927,7 +1927,7 @@ export default function Home() {
                   <span>REVENUE PERFORMANCE (VAS / WA / WB)</span>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                     <div style={{ position: 'relative' }}>
-                      <button onClick={() => { closeAllMenus(); setStatusMenuOpen(!statusMenuOpen); }} style={{ padding: '4px 12px', borderRadius: '15px', backgroundColor: 'rgba(255,255,255,0.2)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                      <button className="tab" onClick={() => { closeAllMenus(); setStatusMenuOpen(!statusMenuOpen); }} style={{ padding: '4px 12px', borderRadius: '15px', backgroundColor: 'rgba(255,255,255,0.2)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '5px' }}>
                         📋 Status: <span style={{ fontWeight: 700 }}>{roStatusFilter}</span>
                         <span style={{ fontSize: '9px', marginLeft: '2px' }}>▼</span>
                       </button>
