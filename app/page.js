@@ -317,7 +317,7 @@ export default function Home() {
     setLoadingOps(true);
     try {
       const [roRes, progRes] = await Promise.all([
-        fetch(`/api/open-ro?limit=10000&startDate=${startDate}&endDate=${endDate}`),
+        fetch(`/api/open-ro?startDate=${startDate}&endDate=${endDate}`),
         fetch(`/api/programs?startDate=${startDate}&endDate=${endDate}`)
       ]);
       const roData = await roRes.json();

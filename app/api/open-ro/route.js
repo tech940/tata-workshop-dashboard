@@ -24,7 +24,7 @@ export async function GET(request) {
         }
 
         if (startDate && endDate) {
-            whereConditions.push(`(Status = 'Open' OR (SAFE_CAST(Job_Card_Created_Date AS DATE) >= SAFE_CAST(@startDate AS DATE) AND SAFE_CAST(Job_Card_Created_Date AS DATE) <= SAFE_CAST(@endDate AS DATE)))`);
+            whereConditions.push(`(Status = 'Open' OR (SAFE_CAST(SUBSTR(Job_Card_Created_Date, 1, 10) AS DATE) >= SAFE_CAST(@startDate AS DATE) AND SAFE_CAST(SUBSTR(Job_Card_Created_Date, 1, 10) AS DATE) <= SAFE_CAST(@endDate AS DATE)))`);
             params.startDate = startDate;
             params.endDate = endDate;
             types.startDate = 'STRING';
@@ -86,7 +86,6 @@ export async function GET(request) {
             FROM \`${projectDataset}.open_ro\`
             ${whereClause}
             ORDER BY open_days DESC, created_date DESC
-            LIMIT @limit OFFSET @offset
         `;
 
         const countQuery = `
