@@ -113,9 +113,9 @@ export default function Home() {
       list = list.filter(r => {
         const s = (r.status || '').toLowerCase();
         if (roStatusFilter === 'Open') {
-          return !s.includes('close') && !s.includes('invoice') && !s.includes('cancel') && !s.includes('new');
+          return s === 'open';
         } else if (roStatusFilter === 'Closed') {
-          return s.includes('close') || s.includes('invoice') || s.includes('new');
+          return s === 'closed';
         }
         return true;
       });
