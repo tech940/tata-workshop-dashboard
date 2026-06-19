@@ -1924,7 +1924,7 @@ export default function Home() {
                         <span style={{ fontSize: '9px', marginLeft: '2px' }}>▼</span>
                       </button>
                       <div className={`loc-popup ${statusMenuOpen ? 'show' : ''}`} style={{ right: 0, top: 'calc(100% + 5px)', minWidth: '120px', backgroundColor: '#fff', color: '#333' }}>
-                        {['All', ...Array.from(new Set(opsOpenRos.map(r => (r.status || 'Unknown').trim()))).sort()].map(status => (
+                        {['All', ...Array.from(new Set(['Open', 'Closed', 'Cancel', ...opsOpenRos.map(r => (r.status || 'Unknown').trim())])).sort()].map(status => (
                           <div 
                             key={status} 
                             className={`loc-option ${roStatusFilter === status ? 'active' : ''}`}
