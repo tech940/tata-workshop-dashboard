@@ -72,6 +72,7 @@ export async function GET(request) {
         // 3. Detailed List Query with search filter
         const listQuery = `
             SELECT 
+                *,
                 JC_Number as jc_number,
                 Job_Card_Created_Date as created_date,
                 Status as status,

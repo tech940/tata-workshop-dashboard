@@ -2847,59 +2847,18 @@ export default function Home() {
 
             <div style={{ padding: '30px', overflowY: 'auto', maxHeight: '70vh' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-                <div style={{ background: '#f1f5f9', padding: '15px', borderRadius: '8px' }}>
-                  <div style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', marginBottom: '4px', textTransform: 'uppercase' }}>STATUS</div>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--navy)' }}>Open</div>
-                </div>
-                <div style={{ background: '#f1f5f9', padding: '15px', borderRadius: '8px' }}>
-                  <div style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', marginBottom: '4px', textTransform: 'uppercase' }}>JOB CARD DELAY REASON</div>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--navy)' }}>{selectedVehicleDetails.delay_reason || '-'}</div>
-                </div>
-                <div style={{ background: '#f1f5f9', padding: '15px', borderRadius: '8px' }}>
-                  <div style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', marginBottom: '4px', textTransform: 'uppercase' }}>CHASSIS NO</div>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--navy)' }}>{selectedVehicleDetails.chassis_no || '-'}</div>
-                </div>
-                <div style={{ background: '#f1f5f9', padding: '15px', borderRadius: '8px' }}>
-                  <div style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', marginBottom: '4px', textTransform: 'uppercase' }}>ACTION ON DELAY REASON</div>
-                  <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--navy)', lineHeight: 1.4 }}>
-                    Receiving Date : {selectedVehicleDetails.created_date?.value || selectedVehicleDetails.created_date || '-'} PTD : - Claim date : -
-                    {selectedVehicleDetails.action_taken ? ' Action: ' + selectedVehicleDetails.action_taken : ''}
+                {Object.entries(selectedVehicleDetails)
+                  .filter(([k]) => !['jc_number', 'created_date', 'status', 'open_days', 'delay_reason', 'action_taken', 'division', 'service_type', 'chassis_no', 'reg_no', 'model'].includes(k))
+                  .map(([key, val]) => (
+                  <div key={key} style={{ background: '#f1f5f9', padding: '15px', borderRadius: '8px' }}>
+                    <div style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', marginBottom: '4px', textTransform: 'uppercase' }}>
+                      {key.replace(/_/g, ' ')}
+                    </div>
+                    <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--navy)', wordBreak: 'break-word' }}>
+                      {val !== null && val !== undefined && val !== '' ? (typeof val === 'object' ? val.value || JSON.stringify(val) : String(val)) : '-'}
+                    </div>
                   </div>
-                </div>
-                <div style={{ background: '#f1f5f9', padding: '15px', borderRadius: '8px' }}>
-                  <div style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', marginBottom: '4px', textTransform: 'uppercase' }}>PPL</div>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--navy)' }}>{selectedVehicleDetails.model || '-'}</div>
-                </div>
-                <div style={{ background: '#f1f5f9', padding: '15px', borderRadius: '8px' }}>
-                  <div style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', marginBottom: '4px', textTransform: 'uppercase' }}># OF JOB CARDS</div>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--navy)' }}>1</div>
-                </div>
-                <div style={{ background: '#f1f5f9', padding: '15px', borderRadius: '8px' }}>
-                  <div style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', marginBottom: '4px', textTransform: 'uppercase' }}>JC OPEN DAYS BUCKET</div>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--navy)' }}>
-                    {parseInt(selectedVehicleDetails.open_days) > 15 ? 'D: > 15 Days' : parseInt(selectedVehicleDetails.open_days) >= 8 ? 'D: 8-15 Days' : parseInt(selectedVehicleDetails.open_days) >= 5 ? 'D: 5-7 Days' : 'D: 0-4 Days'}
-                  </div>
-                </div>
-                <div style={{ background: '#f1f5f9', padding: '15px', borderRadius: '8px' }}>
-                  <div style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', marginBottom: '4px', textTransform: 'uppercase' }}>SERVICE TYPE</div>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--navy)' }}>{selectedVehicleDetails.service_type || '-'}</div>
-                </div>
-                <div style={{ background: '#f1f5f9', padding: '15px', borderRadius: '8px' }}>
-                  <div style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', marginBottom: '4px', textTransform: 'uppercase' }}>REGION</div>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--navy)' }}>{selectedVehicleDetails.region || selectedVehicleDetails.Region || 'North1'}</div>
-                </div>
-                <div style={{ background: '#f1f5f9', padding: '15px', borderRadius: '8px' }}>
-                  <div style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', marginBottom: '4px', textTransform: 'uppercase' }}>JC</div>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--navy)' }}>{selectedVehicleDetails.jc_number || '-'}</div>
-                </div>
-                <div style={{ background: '#f1f5f9', padding: '15px', borderRadius: '8px' }}>
-                  <div style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', marginBottom: '4px', textTransform: 'uppercase' }}>JOB CARD CREATED DATE</div>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--navy)' }}>{selectedVehicleDetails.created_date?.value || selectedVehicleDetails.created_date || '-'}</div>
-                </div>
-                <div style={{ background: '#f1f5f9', padding: '15px', borderRadius: '8px' }}>
-                  <div style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', marginBottom: '4px', textTransform: 'uppercase' }}>DIVISION</div>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--navy)' }}>{selectedVehicleDetails.division || selectedVehicleDetails.Division || '7009420 SaFa Passenger Car'}</div>
-                </div>
+                ))}
               </div>
             </div>
 
