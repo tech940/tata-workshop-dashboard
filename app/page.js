@@ -323,7 +323,7 @@ export default function Home() {
     setLoadingOps(true);
     try {
       const [roRes, progRes] = await Promise.all([
-        fetch('/api/open-ro?limit=10000'),
+        fetch(`/api/open-ro?limit=10000&startDate=${startDate}&endDate=${endDate}`),
         fetch(`/api/programs?startDate=${startDate}&endDate=${endDate}`)
       ]);
       const roData = await roRes.json();
@@ -1231,23 +1231,7 @@ export default function Home() {
               ))}
             </div>
           </div>
-          {/* Status Dropdown */}
-          <div style={{ position: 'relative' }}>
-            <button className="tab active" onClick={() => { closeAllMenus(); setStatusMenuOpen(!statusMenuOpen); }} style={{ padding: '8px 15px', borderRadius: '20px' }}>
-              📋 Status: <span>{roStatusFilter}</span>
-            </button>
-            <div className={`loc-popup ${statusMenuOpen ? 'show' : ''}`} style={{ right: 0, top: 'calc(100% + 5px)', minWidth: '150px' }}>
-              {['All', 'Open', 'Closed'].map(status => (
-                <div 
-                  key={status} 
-                  className={`loc-option ${roStatusFilter === status ? 'active' : ''}`}
-                  onClick={() => { setRoStatusFilter(status); setStatusMenuOpen(false); }}
-                >
-                  <div className="loc-dot"></div>{status}
-                </div>
-              ))}
-            </div>
-          </div>
+
           {/* Service Type Dropdown */}
           <div style={{ position: 'relative' }}>
             <button onClick={() => { closeAllMenus(); setServMenuOpen(!servMenuOpen); }} className="tab active" style={{ padding: '8px 15px', borderRadius: '20px' }}>
@@ -1939,7 +1923,27 @@ export default function Home() {
               <div className="card" style={{ marginTop: '0', borderTopLeftRadius: '0', borderTopRightRadius: '0', overflow: 'visible' }}>
                 <div style={{ background: 'var(--navy)', color: 'white', padding: '8px 20px', fontSize: '12px', fontWeight: 600, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
                   <span>REVENUE PERFORMANCE (VAS / WA / WB)</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                    <div style={{ position: 'relative' }}>
+                      <button className="tab" onClick={() => { closeAllMenus(); setStatusMenuOpen(!statusMenuOpen); }} style={{ padding: '4px 12px', borderRadius: '15px', backgroundColor: 'rgba(255,255,255,0.2)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        📋 Status: <span style={{ fontWeight: 700 }}>{roStatusFilter}</span>
+                        <span style={{ fontSize: '9px', marginLeft: '2px' }}>▼</span>
+                      </button>
+                      <div className={`loc-popup ${statusMenuOpen ? 'show' : ''}`} style={{ right: 0, top: 'calc(100% + 5px)', minWidth: '120px', backgroundColor: '#fff', color: '#333' }}>
+                        {['All', 'Open', 'Closed'].map(status => (
+                          <div 
+                            key={status} 
+                            className={`loc-option ${roStatusFilter === status ? 'active' : ''}`}
+                            onClick={() => { setRoStatusFilter(status); setStatusMenuOpen(false); }}
+                            style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: '1px solid #eee', display: 'flex', alignItems: 'center', gap: '8px' }}
+                          >
+                            <div className="loc-dot" style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: roStatusFilter === status ? 'var(--accent)' : '#ccc' }}></div>{status}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                     <span style={{ fontWeight: 400 }}>Live Calculation from Main Data</span>
+                  </div>
                 </div>
                 <div className="table-container" style={{ maxHeight: '60vh' }}>
                   <table>

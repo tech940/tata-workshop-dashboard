@@ -8,8 +8,30 @@ export async function GET(request) {
         const limit = parseInt(searchParams.get('limit') || '50', 10);
         const offset = parseInt(searchParams.get('offset') || '0', 10);
         const search = searchParams.get('search') || '';
+        const startDate = searchParams.get('startDate');
+        const endDate = searchParams.get('endDate');
 
         const projectDataset = 'tata-one-setup.workshop';
+
+        let whereConditions = [];
+        const params = { limit, offset };
+        const types = { limit: 'INT64', offset: 'INT64' };
+
+        if (search) {
+            whereConditions.push(`(LOWER(JC_Number) LIKE @search OR LOWER(Chassis_No) LIKE @search OR LOWER(Registration_No) LIKE @search OR LOWER(Division) LIKE @search OR LOWER(PPL) LIKE @search OR LOWER(Job_Card_Delay_Reason) LIKE @search)`);
+            params.search = `%${search.toLowerCase()}%`;
+            types.search = 'STRING';
+        }
+
+        if (startDate && endDate) {
+            whereConditions.push(`(Status = 'Open' OR (SAFE_CAST(Job_Card_Created_Date AS DATE) >= SAFE_CAST(@startDate AS DATE) AND SAFE_CAST(Job_Card_Created_Date AS DATE) <= SAFE_CAST(@endDate AS DATE)))`);
+            params.startDate = startDate;
+            params.endDate = endDate;
+            types.startDate = 'STRING';
+            types.endDate = 'STRING';
+        }
+
+        const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
 
         // 1. Grouped Delay Reasons
         const delaysQuery = `
@@ -20,6 +42,7 @@ export async function GET(request) {
                 COUNT(1) as total,
                 COALESCE(ROUND(AVG(SAFE_CAST(JC_Open_Days AS FLOAT64)), 1), 0) as avg_days
             FROM \`${projectDataset}.open_ro\`
+            ${whereClause}
             GROUP BY delay_reason
             ORDER BY total DESC
         `;
@@ -35,6 +58,7 @@ export async function GET(request) {
                 END as age_bucket,
                 COUNT(1) as total_count
             FROM \`${projectDataset}.open_ro\`
+            ${whereClause}
             GROUP BY age_bucket
             ORDER BY 
                 CASE 
@@ -46,23 +70,6 @@ export async function GET(request) {
         `;
 
         // 3. Detailed List Query with search filter
-        let whereClause = '';
-        const params = { limit, offset };
-        const types = { limit: 'INT64', offset: 'INT64' };
-
-        if (search) {
-            whereClause = `
-                WHERE LOWER(JC_Number) LIKE @search
-                   OR LOWER(Chassis_No) LIKE @search
-                   OR LOWER(Registration_No) LIKE @search
-                   OR LOWER(Division) LIKE @search
-                   OR LOWER(PPL) LIKE @search
-                   OR LOWER(Job_Card_Delay_Reason) LIKE @search
-            `;
-            params.search = `%${search.toLowerCase()}%`;
-            types.search = 'STRING';
-        }
-
         const listQuery = `
             SELECT 
                 JC_Number as jc_number,
@@ -94,8 +101,8 @@ export async function GET(request) {
             [listRows],
             [countRows]
         ] = await Promise.all([
-            bigquery.query({ query: delaysQuery }),
-            bigquery.query({ query: ageingQuery }),
+            bigquery.query({ query: delaysQuery, params, types }),
+            bigquery.query({ query: ageingQuery, params, types }),
             bigquery.query({ query: listQuery, params, types }),
             bigquery.query({ query: countQuery, params, types })
         ]);
