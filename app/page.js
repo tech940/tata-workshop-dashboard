@@ -24,6 +24,8 @@ export default function Home() {
   // Filter dropdown menus state
   const [locMenuOpen, setLocMenuOpen] = useState(false);
   const [servMenuOpen, setServMenuOpen] = useState(false);
+  const [statusMenuOpen, setStatusMenuOpen] = useState(false);
+  const [roStatusFilter, setRoStatusFilter] = useState('Open');
   const [dateMenuOpen, setDateMenuOpen] = useState(false);
   const [themeMenuOpen, setThemeMenuOpen] = useState(false);
   const [saMenuOpen, setSaMenuOpen] = useState(false);
@@ -101,14 +103,25 @@ export default function Home() {
   const [perfFilterAlert, setPerfFilterAlert] = useState('All');
   const [perfFilterModel, setPerfFilterModel] = useState('All');
 
-  // Filter Open ROs by selected location
+  // Filter Open ROs by selected location and status
   const filteredOpenRos = useMemo(() => {
     let list = opsOpenRos || [];
     if (selectedLoc && selectedLoc !== 'All Locations') {
       list = list.filter(r => r.division === selectedLoc);
     }
+    if (roStatusFilter && roStatusFilter !== 'All') {
+      list = list.filter(r => {
+        const s = (r.status || '').toLowerCase();
+        if (roStatusFilter === 'Open') {
+          return !s.includes('close') && !s.includes('invoice') && !s.includes('cancel') && !s.includes('new');
+        } else if (roStatusFilter === 'Closed') {
+          return s.includes('close') || s.includes('invoice') || s.includes('new');
+        }
+        return true;
+      });
+    }
     return list;
-  }, [opsOpenRos, selectedLoc]);
+  }, [opsOpenRos, selectedLoc, roStatusFilter]);
   
   const aggregatedOpenRo = useMemo(() => {
     if (!Array.isArray(filteredOpenRos) || filteredOpenRos.length === 0) return { byType: {}, byReason: [], totalRow: null, reasonTotalRow: null };
@@ -211,6 +224,7 @@ export default function Home() {
   const closeAllMenus = useCallback(() => {
     setLocMenuOpen(false);
     setServMenuOpen(false);
+    setStatusMenuOpen(false);
     setDateMenuOpen(false);
     setThemeMenuOpen(false);
     setSaMenuOpen(false);
@@ -1217,6 +1231,26 @@ export default function Home() {
               ))}
             </div>
           </div>
+
+          {/* Status Dropdown (Visible only in Open RO view) */}
+          {viewMode === 'open_ro' && (
+            <div style={{ position: 'relative' }}>
+              <button onClick={() => { closeAllMenus(); setStatusMenuOpen(!statusMenuOpen); }} className="tab active" style={{ padding: '8px 15px', borderRadius: '20px', backgroundColor: 'var(--accent)', color: '#fff' }}>
+                📋 Status: <span>{roStatusFilter}</span>
+              </button>
+              <div className={`loc-popup ${statusMenuOpen ? 'show' : ''}`} style={{ right: 0, top: 'calc(100% + 5px)', minWidth: '150px' }}>
+                {['All', 'Open', 'Closed'].map(status => (
+                  <div 
+                    key={status} 
+                    className={`loc-option ${roStatusFilter === status ? 'active' : ''}`}
+                    onClick={() => { setRoStatusFilter(status); setStatusMenuOpen(false); }}
+                  >
+                    <div className="loc-dot"></div>{status}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Service Type Dropdown */}
           <div style={{ position: 'relative' }}>
