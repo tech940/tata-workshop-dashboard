@@ -110,7 +110,13 @@ export async function GET(request) {
         return NextResponse.json({
             delays: delaysRows,
             ageing: ageingRows,
-            openRos: listRows.map(r => ({ ...r, division: getMappedLocation(r.division) })),
+            openRos: listRows.map(r => ({ 
+                ...r, 
+                jc_number: r.JC_Number || r.jc_number,
+                status: r.Status || r.status,
+                division: getMappedLocation(r.Division || r.division),
+                service_type: r.Service_Type || r.service_type
+            })),
             total: countRows[0] ? countRows[0].total_count : 0
         });
 
